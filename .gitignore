@@ -1,0 +1,30 @@
+# Build results
+bin/
+obj/
+dist/
+
+# IDEs
+.vscode/
+.idea/
+*.sln.user
+*.user
+*.suo
+*.vs/
+
+# Node modules
+node_modules/
+package-lock.json
+yarn.lock
+
+# Generated files
+generated/
+*.mmd
+*.plantuml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

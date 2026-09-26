@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeExplainer.Core\CodeExplainer.Core.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Scanner\CodeExplainer.Scanner.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Analyzers.CSharp\CodeExplainer.Analyzers.CSharp.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Analyzers.TypeScript\CodeExplainer.Analyzers.TypeScript.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Analyzers.Angular\CodeExplainer.Analyzers.Angular.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Analyzers.React\CodeExplainer.Analyzers.React.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Export.Mermaid\CodeExplainer.Export.Mermaid.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Export.PlantUml\CodeExplainer.Export.PlantUml.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Export.Markdown\CodeExplainer.Export.Markdown.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <PackageReference Include="System.CommandLine.DragonFruit" Version="0.4.0" />
+  </ItemGroup>
+
+</Project>
