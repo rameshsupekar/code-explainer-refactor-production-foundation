@@ -1,0 +1,958 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-10-16T13:24:08.4426419Z",
+  "analysisEndTime": "2026-10-16T13:24:09.3565164Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 11,
+      "issues": 2,
+      "incidents": 24,
+      "effort": 24
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 11,
+        "Optional": 0,
+        "Potential": 13,
+        "Information": 0
+      },
+      "category": {
+        "Project": 11,
+        "Api": 13
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "src\\CodeExplainer.Analyzers.Angular\\CodeExplainer.Analyzers.Angular.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Analyzers.Angular",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 42,
+        "linesOfCode": 42,
+        "totalApiScanned": 14,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "976b6184-a548-444b-a88d-5d36a0022d09",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Analyzers.Angular\\CodeExplainer.Analyzers.Angular.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Analyzers.Angular\\CodeExplainer.Analyzers.Angular.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Analyzers.CSharp\\CodeExplainer.Analyzers.CSharp.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Analyzers.CSharp",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 66,
+        "linesOfCode": 66,
+        "totalApiScanned": 150,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "90cfb9c4-55bc-406e-abcb-6ba403142f54",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Analyzers.CSharp\\CodeExplainer.Analyzers.CSharp.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Analyzers.CSharp\\CodeExplainer.Analyzers.CSharp.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Analyzers.React\\CodeExplainer.Analyzers.React.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Analyzers.React",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 45,
+        "linesOfCode": 45,
+        "totalApiScanned": 14,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "358965de-44ee-47f1-8752-c0ee3244514c",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Analyzers.React\\CodeExplainer.Analyzers.React.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Analyzers.React\\CodeExplainer.Analyzers.React.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Analyzers.TypeScript\\CodeExplainer.Analyzers.TypeScript.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Analyzers.TypeScript",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 49,
+        "linesOfCode": 49,
+        "totalApiScanned": 30,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "5aadd557-b9c0-4560-8c94-854ecb364bce",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Analyzers.TypeScript\\CodeExplainer.Analyzers.TypeScript.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Analyzers.TypeScript\\CodeExplainer.Analyzers.TypeScript.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+      "startingProject": true,
+      "issues": 2,
+      "storyPoints": 14,
+      "properties": {
+        "appName": "CodeExplainer.Cli",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 71,
+        "linesOfCode": 71,
+        "totalApiScanned": 87,
+        "minLinesOfCodeToChange": 13,
+        "maxLinesOfCodeToChange": 13
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "8dea86c8-1b01-4fe5-ac7e-34ce35af5f63",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "f058ac6c-c4a3-48fd-ad29-ae1ff68c151d",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "rootCommand.Subcommands.Add(analyzeCommand);",
+              "protected": "P:System.CommandLine.Command.Subcommands"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "rootCommand.Subcommands.Add(analyzeCommand);",
+            "protectedSnippet": "P:System.CommandLine.Command.Subcommands",
+            "label": "P:System.CommandLine.Command.Subcommands",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 65,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "3473f16f-530b-4bb2-a42c-0ddae3c50bc0",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "analyzeCommand.Options.Add(diagramOption);",
+              "protected": "P:System.CommandLine.Command.Options"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "analyzeCommand.Options.Add(diagramOption);",
+            "protectedSnippet": "P:System.CommandLine.Command.Options",
+            "label": "P:System.CommandLine.Command.Options",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 37,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "27724a05-ad72-4489-b42e-5461fcf111cb",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "analyzeCommand.Options.Add(outputOption);",
+              "protected": "P:System.CommandLine.Command.Options"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "analyzeCommand.Options.Add(outputOption);",
+            "protectedSnippet": "P:System.CommandLine.Command.Options",
+            "label": "P:System.CommandLine.Command.Options",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 36,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "385cd902-be51-4844-99d2-8c969af5c3f8",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "analyzeCommand.Options.Add(formatOption);",
+              "protected": "P:System.CommandLine.Command.Options"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "analyzeCommand.Options.Add(formatOption);",
+            "protectedSnippet": "P:System.CommandLine.Command.Options",
+            "label": "P:System.CommandLine.Command.Options",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 35,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "167814e6-c85d-4fe4-b198-d917be9694e3",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "analyzeCommand.Arguments.Add(pathArgument);",
+              "protected": "P:System.CommandLine.Command.Arguments"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "analyzeCommand.Arguments.Add(pathArgument);",
+            "protectedSnippet": "P:System.CommandLine.Command.Arguments",
+            "label": "P:System.CommandLine.Command.Arguments",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 34,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "4adc51a1-5b2f-4b81-bd2a-320ef7f2d56a",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var analyzeCommand = new Command(\u0022analyze\u0022, \u0022Analyze code and generate architecture diagrams\u0022);",
+              "protected": "T:System.CommandLine.Command"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var analyzeCommand = new Command(\u0022analyze\u0022, \u0022Analyze code and generate architecture diagrams\u0022);",
+            "protectedSnippet": "T:System.CommandLine.Command",
+            "label": "T:System.CommandLine.Command",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 33,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "a3f5b6a1-287c-4989-98ba-6bcb6df1da87",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var analyzeCommand = new Command(\u0022analyze\u0022, \u0022Analyze code and generate architecture diagrams\u0022);",
+              "protected": "M:System.CommandLine.Command.#ctor(System.String,System.String)"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var analyzeCommand = new Command(\u0022analyze\u0022, \u0022Analyze code and generate architecture diagrams\u0022);",
+            "protectedSnippet": "M:System.CommandLine.Command.#ctor(System.String,System.String)",
+            "label": "M:System.CommandLine.Command.#ctor(System.String,System.String)",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 33,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "d928d3de-6f18-4a0c-aa9f-f44d14ad1818",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var diagramOption = new Option\u003Cstring\u003E(\u0022--diagram\u0022, \u0022-d\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022dependency,class\u0022,\n                Description = \u0022Comma-separated diagram types: dependency, class, component, sequence\u0022\n            };",
+              "protected": "P:System.CommandLine.Symbol.Description"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var diagramOption = new Option\u003Cstring\u003E(\u0022--diagram\u0022, \u0022-d\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022dependency,class\u0022,\n                Description = \u0022Comma-separated diagram types: dependency, class, component, sequence\u0022\n            };",
+            "protectedSnippet": "P:System.CommandLine.Symbol.Description",
+            "label": "P:System.CommandLine.Symbol.Description",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 27,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "6cd03474-7099-4be3-b0e8-1d9ac0cf9370",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var outputOption = new Option\u003Cstring\u003E(\u0022--output\u0022, \u0022-o\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022./generated\u0022,\n                Description = \u0022Output directory for diagrams\u0022\n            };",
+              "protected": "P:System.CommandLine.Symbol.Description"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var outputOption = new Option\u003Cstring\u003E(\u0022--output\u0022, \u0022-o\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022./generated\u0022,\n                Description = \u0022Output directory for diagrams\u0022\n            };",
+            "protectedSnippet": "P:System.CommandLine.Symbol.Description",
+            "label": "P:System.CommandLine.Symbol.Description",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 22,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "b5caf3c1-006a-4a5b-b9bb-2f92453b16cb",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var formatOption = new Option\u003Cstring\u003E(\u0022--format\u0022, \u0022-f\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022mermaid\u0022,\n                Description = \u0022Output format: mermaid or plantuml\u0022\n            };",
+              "protected": "P:System.CommandLine.Symbol.Description"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var formatOption = new Option\u003Cstring\u003E(\u0022--format\u0022, \u0022-f\u0022)\n            {\n                DefaultValueFactory = _ =\u003E \u0022mermaid\u0022,\n                Description = \u0022Output format: mermaid or plantuml\u0022\n            };",
+            "protectedSnippet": "P:System.CommandLine.Symbol.Description",
+            "label": "P:System.CommandLine.Symbol.Description",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 17,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "20da2fc8-e831-46e1-a32e-0f4a6daa1e6f",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var pathArgument = new Argument\u003CDirectoryInfo\u003E(\u0022path\u0022)\n            {\n                Description = \u0022Path to the folder to analyze\u0022\n            };",
+              "protected": "P:System.CommandLine.Symbol.Description"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var pathArgument = new Argument\u003CDirectoryInfo\u003E(\u0022path\u0022)\n            {\n                Description = \u0022Path to the folder to analyze\u0022\n            };",
+            "protectedSnippet": "P:System.CommandLine.Symbol.Description",
+            "label": "P:System.CommandLine.Symbol.Description",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 13,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "975db022-ba00-4742-8120-f1533a2a440b",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var rootCommand = new RootCommand(\u0022Code architecture analyzer for C#, TypeScript, Angular, and React\u0022);",
+              "protected": "T:System.CommandLine.RootCommand"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var rootCommand = new RootCommand(\u0022Code architecture analyzer for C#, TypeScript, Angular, and React\u0022);",
+            "protectedSnippet": "T:System.CommandLine.RootCommand",
+            "label": "T:System.CommandLine.RootCommand",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 11,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "80aa695f-f904-4ee0-aa3e-3da495144487",
+          "ruleId": "Api.0002",
+          "description": "API is available in package System.CommandLine, 2.0.0-beta4.22272.1. Add package reference to System.CommandLine, 2.0.0-beta4.22272.1",
+          "projectPath": "src\\CodeExplainer.Cli\\CodeExplainer.Cli.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var rootCommand = new RootCommand(\u0022Code architecture analyzer for C#, TypeScript, Angular, and React\u0022);",
+              "protected": "M:System.CommandLine.RootCommand.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Cli\\Program.cs",
+            "snippet": "var rootCommand = new RootCommand(\u0022Code architecture analyzer for C#, TypeScript, Angular, and React\u0022);",
+            "protectedSnippet": "M:System.CommandLine.RootCommand.#ctor(System.String)",
+            "label": "M:System.CommandLine.RootCommand.#ctor(System.String)",
+            "properties": {
+              "PackageId": "System.CommandLine",
+              "PackageNewVersion": "2.0.0-beta4.22272.1",
+              "CharCount": "2757"
+            },
+            "line": 11,
+            "column": 12
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Core\\CodeExplainer.Core.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Core",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 6,
+        "numberOfCodeFiles": 6,
+        "linesTotal": 394,
+        "linesOfCode": 394,
+        "totalApiScanned": 604,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "3d2a9004-6c5c-4b89-9c33-f1961cab7eb8",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Core\\CodeExplainer.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Core\\CodeExplainer.Core.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Export.Markdown\\CodeExplainer.Export.Markdown.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Export.Markdown",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 31,
+        "linesOfCode": 31,
+        "totalApiScanned": 7,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "893d2beb-77b4-4c18-9579-d1b57ec1e878",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Export.Markdown\\CodeExplainer.Export.Markdown.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Export.Markdown\\CodeExplainer.Export.Markdown.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Export.Mermaid\\CodeExplainer.Export.Mermaid.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Export.Mermaid",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 37,
+        "linesOfCode": 37,
+        "totalApiScanned": 137,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "e2620d6b-585a-46da-aba0-d64560fc6dbe",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Export.Mermaid\\CodeExplainer.Export.Mermaid.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Export.Mermaid\\CodeExplainer.Export.Mermaid.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Export.PlantUml\\CodeExplainer.Export.PlantUml.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Export.PlantUml",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 48,
+        "linesOfCode": 48,
+        "totalApiScanned": 22,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "bff95e2b-2618-4c12-a097-9e388adc78ba",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Export.PlantUml\\CodeExplainer.Export.PlantUml.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Export.PlantUml\\CodeExplainer.Export.PlantUml.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Relationships\\CodeExplainer.Relationships.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Relationships",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 32,
+        "linesOfCode": 32,
+        "totalApiScanned": 8,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "3d6f2926-f08c-4830-85e3-3789ef101ea1",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Relationships\\CodeExplainer.Relationships.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Relationships\\CodeExplainer.Relationships.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "src\\CodeExplainer.Scanner\\CodeExplainer.Scanner.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "CodeExplainer.Scanner",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 82,
+        "linesOfCode": 82,
+        "totalApiScanned": 54,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "5b185776-69c8-40ed-95da-36d49cf48ee6",
+          "ruleId": "Project.0002",
+          "projectPath": "src\\CodeExplainer.Scanner\\CodeExplainer.Scanner.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "src\\CodeExplainer.Scanner\\CodeExplainer.Scanner.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Project\u0027s target framework(s) needs to be changed to the new target framework that you selected for this upgrade.\n\nDuring upgrade target framework will be adjusted to corresponding platform when applicable. In some cases project would result in multiple target frameworks after the upgrade if it was using features that now have their own platforms in modern .NET frameworks (windows, iOS, Android etc).",
+      "label": "Project\u0027s target framework(s) needs to be changed",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Overview of porting from .NET Framework to .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET project SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0002": {
+      "id": "Api.0002",
+      "isFeature": false,
+      "description": "API is source incompatible for selected .NET version: requires code changes to compile successfully when targeting a new version, such as removing obsolete APIs or changing method signatures.",
+      "label": "Source incompatible for selected .NET version",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    }
+  }
+}
