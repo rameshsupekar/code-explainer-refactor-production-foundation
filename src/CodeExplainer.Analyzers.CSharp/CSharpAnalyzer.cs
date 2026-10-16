@@ -23,7 +23,7 @@ public sealed class CSharpAnalyzer
             cancellationToken.ThrowIfCancellationRequested();
             var name = type.Identifier.ValueText;
             var qualifiedName = string.IsNullOrEmpty(namespaceName) ? name : $"{namespaceName}.{name}";
-            var kind = type is InterfaceDeclarationSyntax ? SymbolKind.Interface : SymbolKind.Class;
+            var kind = type is InterfaceDeclarationSyntax ? Core.Models.SymbolKind.Interface : Core.Models.SymbolKind.Class;
             var metadata = new Dictionary<string, string> { ["namespace"] = namespaceName };
             if (type.BaseList != null) metadata["baseTypes"] = string.Join(",", type.BaseList.Types.Select(t => t.Type.ToString()));
             var members = type.Members.Select(member => CreateMember(member, filePath, tree)).ToList();

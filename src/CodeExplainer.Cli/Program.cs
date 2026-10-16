@@ -1,6 +1,5 @@
 using System;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -12,27 +11,42 @@ namespace CodeExplainer.Cli
         {
             var rootCommand = new RootCommand("Code architecture analyzer for C#, TypeScript, Angular, and React");
 
-            var analyzeCommand = new Command("analyze", "Analyze code and generate architecture diagrams")
+            var pathArgument = new Argument<DirectoryInfo>("path")
             {
-                new Argument<DirectoryInfo>("path", "Path to the folder to analyze"),
-                new Option<string>(
-                    new[] { "--format", "-f" },
-                    getDefaultValue: () => "mermaid",
-                    description: "Output format: mermaid or plantuml"),
-                new Option<string>(
-                    new[] { "--output", "-o" },
-                    getDefaultValue: () => "./generated",
-                    description: "Output directory for diagrams"),
-                new Option<string>(
-                    new[] { "--diagram", "-d" },
-                    getDefaultValue: () => "dependency,class",
-                    description: "Comma-separated diagram types: dependency, class, component, sequence")
+                Description = "Path to the folder to analyze"
+            };
+            var formatOption = new Option<string>("--format", "-f")
+            {
+                DefaultValueFactory = _ => "mermaid",
+                Description = "Output format: mermaid or plantuml"
+            };
+            var outputOption = new Option<string>("--output", "-o")
+            {
+                DefaultValueFactory = _ => "./generated",
+                Description = "Output directory for diagrams"
+            };
+            var diagramOption = new Option<string>("--diagram", "-d")
+            {
+                DefaultValueFactory = _ => "dependency,class",
+                Description = "Comma-separated diagram types: dependency, class, component, sequence"
             };
 
-            analyzeCommand.SetHandler(async (DirectoryInfo path, string format, string output, string diagram) =>
+            var analyzeCommand = new Command("analyze", "Analyze code and generate architecture diagrams");
+            analyzeCommand.Arguments.Add(pathArgument);
+            analyzeCommand.Options.Add(formatOption);
+            analyzeCommand.Options.Add(outputOption);
+            analyzeCommand.Options.Add(diagramOption);
+
+            analyzeCommand.SetAction(parseResult =>
             {
                 try
                 {
+                    var path = parseResult.GetValue(pathArgument)
+                        ?? throw new InvalidOperationException("A path is required.");
+                    var format = parseResult.GetValue(formatOption);
+                    var output = parseResult.GetValue(outputOption);
+                    var diagram = parseResult.GetValue(diagramOption);
+
                     Console.WriteLine($"📁 Analyzing: {path.FullName}");
                     Console.WriteLine($"📊 Format: {format}");
                     Console.WriteLine($"📤 Output: {output}");
@@ -40,20 +54,18 @@ namespace CodeExplainer.Cli
                     
                     // TODO: Implement analysis logic
                     Console.WriteLine("\n✅ Analysis complete!");
+                    return 0;
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"❌ Error: {ex.Message}");
-                    Environment.Exit(1);
+                    return 1;
                 }
-            }, new Argument<DirectoryInfo>("path"), 
-               new Option<string>(new[] { "--format", "-f" }),
-               new Option<string>(new[] { "--output", "-o" }),
-               new Option<string>(new[] { "--diagram", "-d" }));
+            });
 
-            rootCommand.AddCommand(analyzeCommand);
+            rootCommand.Subcommands.Add(analyzeCommand);
 
-            return await rootCommand.InvokeAsync(args);
+            return await rootCommand.Parse(args).InvokeAsync();
         }
     }
 }
