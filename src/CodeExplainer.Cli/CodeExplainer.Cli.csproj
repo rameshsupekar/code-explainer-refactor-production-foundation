@@ -17,10 +17,11 @@
     <ProjectReference Include="..\CodeExplainer.Export.Mermaid\CodeExplainer.Export.Mermaid.csproj" />
     <ProjectReference Include="..\CodeExplainer.Export.PlantUml\CodeExplainer.Export.PlantUml.csproj" />
     <ProjectReference Include="..\CodeExplainer.Export.Markdown\CodeExplainer.Export.Markdown.csproj" />
+    <ProjectReference Include="..\CodeExplainer.Relationships\CodeExplainer.Relationships.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <PackageReference Include="System.CommandLine" />
   </ItemGroup>
 
 </Project>

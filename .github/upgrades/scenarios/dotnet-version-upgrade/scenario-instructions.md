@@ -8,10 +8,11 @@
 - **Build Locator**: Use the latest version
 - **Diagram Scope**: Validate and improve folder-wide diagram generation and UI workflows without hard-coding behavior for `C:\Work\UnitsConverter`.
 - **Validation Inputs**: Test reverse-engineering explanations/diagrams for this repository and `C:\Work\UnitsConverter` when accessible.
+- **Documentation**: Do not create any README/readme files unless explicitly requested.
 
 ## Strategy
 **Selected**: All-at-Once
-**Rationale**: All 11 projects are SDK-style and target net8.0; the upgrade is modern-to-modern with a straightforward dependency graph and one reported CLI compatibility cluster.
+**Rationale**: All 11 SDK-style projects already target net10.0 on the checked-out branch; the generated assessment still lists net8.0. All-at-Once remains appropriate for validating and completing the requested package/API work together.
 
 ### Execution Constraints
 - Upgrade all project target frameworks together in one atomic operation; do not leave mixed target frameworks.
@@ -35,3 +36,10 @@
 
 ### Project Structure
 - Package Management: Central Package Management (CPM)
+
+## Build Tool Decisions
+- **All CodeExplainer SDK-style projects**: `dotnet build` (the solution targets modern .NET and no WPF, embedded-resource, or legacy MSBuild requirements were found).
+
+## User Preferences
+### Technical Preferences
+- **Project layout**: Do not introduce a new `src/` layout by moving only selected projects. If a `src/` layout is needed, move all existing production projects together and update solution/project references; otherwise preserve the current layout.
