@@ -5,12 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RazorLangVersion>latest</RazorLangVersion>
 
-    <!-- AOT and delivery optimizations -->
+    <!-- Keep linking enabled for smaller payloads, but do NOT enable AOT/publish flags by default.
+         AOT for Blazor WebAssembly should be enabled only at publish time using MSBuild properties,
+         because `dotnet run` (the dev flow) does not support AOT for the browser-wasm RID. -->
     <InvariantGlobalization>true</InvariantGlobalization>
     <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
-    <RunAOTCompilation>true</RunAOTCompilation>
-    <PublishTrimmed>true</PublishTrimmed>
-    <PublishAot>true</PublishAot>
   </PropertyGroup>
 
   <ItemGroup>
