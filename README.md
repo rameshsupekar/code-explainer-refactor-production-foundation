@@ -157,6 +157,50 @@ cd src/CodeExplainer.Cli
 dotnet run -- analyze ./path/to/code --format mermaid --output ./output
 ```
 
+## Development (frontend + backend)
+
+Start the API (port 5000):
+
+```bash
+dotnet run --project src/CodeExplainer.Api --urls "http://127.0.0.1:5000"
+```
+
+Start the Blazor dev server (ports 5002/5003):
+
+```bash
+dotnet run --project src/CodeExplainer.BlazorViewer --urls "http://127.0.0.1:5002;https://127.0.0.1:5003"
+```
+
+Start Angular (uses proxy to forward /api to backend):
+
+```bash
+cd src/CodeExplainer.Angular
+npm install
+npm run start
+```
+
+Open:
+- Angular: http://localhost:4200
+- Blazor: http://127.0.0.1:5002
+
+## Production build & AOT (Blazor)
+
+Blazor (AOT publish):
+
+```bash
+dotnet publish src/CodeExplainer.BlazorViewer -c Release -o ./publish/BlazorViewer -p:RunAOTCompilation=true -p:PublishAot=true -p:PublishTrimmed=true
+```
+
+Angular prod build:
+
+```bash
+cd src/CodeExplainer.Angular
+npm ci
+npm run build:prod
+```
+
+Deploy: copy Angular dist or Blazor publish output to your API wwwroot (or host them on a static host/CDN). Precompress assets (Brotli/gzip) and set proper Content-Encoding headers.
+
 ## License
 
 MIT
