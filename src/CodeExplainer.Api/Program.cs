@@ -10,20 +10,73 @@ Directory.CreateDirectory(logsDir);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Strict CORS - only allow the expected development origins
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("local", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200", "http://localhost:5000", "http://127.0.0.1:5000", "https://localhost:5001")
+        policy.WithOrigins("http://localhost:4200", "http://127.0.0.1:4200", "http://127.0.0.1:5002", "http://127.0.0.1:5000")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
+
 builder.Services.AddSingleton<IDiagramService, LocalDiagramService>();
 
 var app = builder.Build();
 
-// Simple request logging middleware that writes to logs/requests.log
+// Security headers and CSP
+var csp = string.Join("; ", new[] {
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:" ,
+    "connect-src 'self' http://127.0.0.1:5000 ws:",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+});
+
+app.Use(async (context, next) =>
+{
+    // Add common security headers
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.Headers["Permissions-Policy"] = "geolocation=(), microphone=()";
+    context.Response.Headers["Content-Security-Policy"] = csp;
+
+    // HSTS only when SSL is used
+    if (context.Request.IsHttps)
+    {
+        context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+    }
+
+    // Cache policy: no-store for dynamic API endpoints, aggressive for static assets
+    void SetNoStore() => context.Response.Headers["Cache-Control"] = "no-store";
+    void SetStaticCache() => context.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
+
+    var path = context.Request.Path.Value ?? string.Empty;
+    var ext = Path.GetExtension(path).ToLowerInvariant();
+    if (path.StartsWith("/api/") || context.Request.Method != "GET")
+    {
+        SetNoStore();
+    }
+    else if (ext == ".js" || ext == ".css" || ext == ".wasm" || ext == ".json" || ext == ".svg" || ext == ".png" || ext == ".jpg" || ext == ".woff2" || ext == ".woff" || ext == ".ttf")
+    {
+        SetStaticCache();
+    }
+    else
+    {
+        // default: no-cache for HTML pages
+        context.Response.Headers["Cache-Control"] = "no-cache, must-revalidate, max-age=0";
+    }
+
+    await next();
+});
+
+// Simple request logging middleware that writes to logs/requests.log and errors.log
 app.Use(async (context, next) =>
 {
     var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -55,7 +108,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
-// Endpoint for clients (Blazor/Angular) to POST logs to the server
 app.MapPost("/logs", async (HttpRequest req) =>
 {
     try
