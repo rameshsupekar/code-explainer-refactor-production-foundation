@@ -81,36 +81,54 @@ namespace CodeExplainer.Scanner
             return files;
         }
 
-        public Task<ProjectInfo?> DiscoverProjectAsync(string rootPath, CancellationToken cancellationToken)
+        public async Task<ProjectInfo?> DiscoverProjectAsync(string rootPath, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(rootPath);
             cancellationToken.ThrowIfCancellationRequested();
             var scope = ResolveScope(rootPath);
             var projectFiles = scope.ProjectPaths.ToHashSet(PathComparer);
             var tsConfigs = new HashSet<string>(PathComparer);
-            foreach (var directory in scope.ScanDirectories)
+            var allFiles = scope.ScanDirectories.Concat(new[] { scope.RootPath })
+                .Distinct(PathComparer)
+                .SelectMany(directory => EnumerateAllFiles(directory, AnalysisOptions.DefaultIgnorePatterns, cancellationToken))
+                .Distinct(PathComparer)
+                .ToArray();
+            var behaviorSpecPaths = new List<string>();
+            var configurationPaths = new List<string>();
+            foreach (var file in allFiles)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                foreach (var file in EnumerateAllFiles(directory, AnalysisOptions.DefaultIgnorePatterns, cancellationToken))
+                if (Path.GetFileName(file).StartsWith("tsconfig", StringComparison.OrdinalIgnoreCase) &&
+                    Path.GetExtension(file).Equals(".json", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (Path.GetFileName(file).StartsWith("tsconfig", StringComparison.OrdinalIgnoreCase) &&
-                        Path.GetExtension(file).Equals(".json", StringComparison.OrdinalIgnoreCase))
-                    {
-                        tsConfigs.Add(file);
-                    }
-
-                    if (Path.GetExtension(file).Equals(".csproj", StringComparison.OrdinalIgnoreCase))
-                        projectFiles.Add(file);
+                    tsConfigs.Add(file);
                 }
+
+                if (Path.GetExtension(file).Equals(".csproj", StringComparison.OrdinalIgnoreCase))
+                    projectFiles.Add(file);
+                if (Path.GetExtension(file).Equals(".feature", StringComparison.OrdinalIgnoreCase))
+                    behaviorSpecPaths.Add(file);
+                if (RepositoryEvidenceScanner.IsConfigurationFile(file))
+                    configurationPaths.Add(file);
             }
 
-            if (scope.SolutionPath == null && projectFiles.Count == 0 && tsConfigs.Count == 0)
-                return Task.FromResult<ProjectInfo?>(null);
+            if (scope.SolutionPath == null && projectFiles.Count == 0 && tsConfigs.Count == 0 &&
+                configurationPaths.Count == 0 && behaviorSpecPaths.Count == 0)
+                return null;
 
-            return Task.FromResult<ProjectInfo?>(new ProjectInfo(
+            var inventoryFiles = allFiles.Where(RepositoryEvidenceScanner.IsConfigurationFile).ToArray();
+            var evidence = await RepositoryEvidenceScanner.ScanAsync(inventoryFiles, scope.RootPath, cancellationToken).ConfigureAwait(false);
+            return new ProjectInfo(
                 scope.SolutionPath,
                 projectFiles.OrderBy(path => path, PathComparer).ToArray(),
-                tsConfigs.OrderBy(path => path, PathComparer).ToArray()));
+                tsConfigs.OrderBy(path => path, PathComparer).ToArray())
+            {
+                Evidence = evidence,
+                ConfigurationPaths = configurationPaths.OrderBy(path => path, PathComparer)
+                    .Select(path => Path.GetRelativePath(scope.RootPath, path).Replace('\\', '/')).ToArray(),
+                BehaviorSpecPaths = behaviorSpecPaths.OrderBy(path => path, PathComparer)
+                    .Select(path => Path.GetRelativePath(scope.RootPath, path).Replace('\\', '/')).ToArray()
+            };
         }
 
         public string GetLanguage(FileInfo file) => Path.GetExtension(file.Name).ToLowerInvariant() switch

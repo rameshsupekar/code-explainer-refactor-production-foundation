@@ -9,7 +9,7 @@ namespace CodeExplainer.Core
         string RootPath,
         string? OutputPath = null,
         string OutputFormat = "mermaid",
-        string DiagramTypes = "dependency,class",
+        string DiagramTypes = "architecture,modules,behavior,dependency,class,component,sequence",
         bool IncludeTestFiles = false,
         IReadOnlyList<string>? IgnorePatterns = null,
         string? WorkerPath = null,
@@ -20,7 +20,7 @@ namespace CodeExplainer.Core
         /// </summary>
         public IReadOnlySet<string> ParsedDiagramTypes =>
             new HashSet<string>(
-                (DiagramTypes ?? "dependency,class").Split(','),
+                (DiagramTypes ?? "architecture,modules,behavior,dependency,class,component,sequence").Split(','),
                 System.StringComparer.OrdinalIgnoreCase);
 
         /// <summary>

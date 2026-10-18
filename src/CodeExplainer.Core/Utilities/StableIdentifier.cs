@@ -74,6 +74,7 @@ namespace CodeExplainer.Core.Utilities
 
             return label
                 .Replace("&", "&amp;")
+                .Replace(";", "&#59;")
                 .Replace("<", "&lt;")
                 .Replace(">", "&gt;")
                 .Replace("\"", "&quot;")
@@ -82,8 +83,8 @@ namespace CodeExplainer.Core.Utilities
                 .Replace("]", "&#93;")
                 .Replace("(", "&#40;")
                 .Replace(")", "&#41;")
-                .Replace("{{", "&#123;&#123;")
-                .Replace("}}", "&#125;&#125;")
+                .Replace("{", "&#123;")
+                .Replace("}", "&#125;")
                 .Replace("\n", " ")
                 .Replace("\r", " ");
         }

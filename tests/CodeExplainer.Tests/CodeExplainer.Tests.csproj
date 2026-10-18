@@ -9,8 +9,16 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Reqnroll.xUnit" />
+    <PackageReference Include="Reqnroll.Tools.MsBuild.Generation" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ReqnrollFeatureFiles Include="..\..\docs\behavior\code-explainer-cli.feature"
+                         Link="Features\code-explainer-cli.feature"
+                         CodeBehindFile="..\..\docs\behavior\code-explainer-cli.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -26,6 +26,8 @@ namespace CodeExplainer.Export.Markdown
             sb.AppendLine($"- Symbols: {model.Symbols.Count}");
             sb.AppendLine($"- Relationships: {model.Relationships.Count}");
             sb.AppendLine($"- Diagnostics: {model.Diagnostics.Count}");
+            var languages = model.Files.Select(file => file.Language).Distinct(StringComparer.Ordinal).OrderBy(language => language, StringComparer.Ordinal).ToArray();
+            sb.AppendLine($"- Languages detected: {(languages.Length == 0 ? "none" : string.Join(", ", languages))}");
 
             if (projectInfo != null)
             {
@@ -36,6 +38,29 @@ namespace CodeExplainer.Export.Markdown
                     sb.AppendLine($"- Project: {Path.GetFileName(projectPath)}");
                 foreach (var configPath in projectInfo.TypeScriptConfigPaths.OrderBy(path => path, StringComparer.Ordinal))
                     sb.AppendLine($"- TypeScript config: {Path.GetFileName(configPath)}");
+            }
+
+            sb.AppendLine("\n## Technology and infrastructure evidence\n");
+            if (projectInfo?.Evidence.Count > 0)
+            {
+                foreach (var evidence in projectInfo.Evidence
+                    .OrderBy(item => item.Category, StringComparer.Ordinal)
+                    .ThenBy(item => item.Name, StringComparer.Ordinal)
+                    .ThenBy(item => item.SourcePath, StringComparer.Ordinal))
+                {
+                    sb.AppendLine($"- **{EscapeMarkdown(evidence.Name)}** ({EscapeMarkdown(evidence.Category)}, {EscapeMarkdown(evidence.Confidence)}) — `{EscapeMarkdown(evidence.SourcePath)}`; {EscapeMarkdown(evidence.EvidenceType)}");
+                }
+            }
+            else
+            {
+                sb.AppendLine("No technology or infrastructure evidence was found in recognized repository manifests.");
+            }
+
+            if (projectInfo?.ConfigurationPaths.Count > 0)
+            {
+                sb.AppendLine("\n### Configuration sources\n");
+                foreach (var configPath in projectInfo.ConfigurationPaths.OrderBy(path => path, StringComparer.Ordinal))
+                    sb.AppendLine($"- `{EscapeMarkdown(configPath)}` (values are not copied into this report)");
             }
 
             sb.AppendLine("\n## Source files\n");
@@ -69,6 +94,43 @@ namespace CodeExplainer.Export.Markdown
             if (model.Relationships.Count == 0)
                 sb.AppendLine("No relationships identified.");
 
+            sb.AppendLine("\n## BDD behavior and implementation traceability\n");
+            var behaviorFeatures = projectInfo?.BehaviorFeatures ?? Array.Empty<BehaviorFeature>();
+            if (behaviorFeatures.Count == 0)
+            {
+                sb.AppendLine("No Gherkin feature files or endpoint-backed behavior drafts were found. Static analysis cannot establish complete business behavior; add authored `.feature` files for authoritative scenarios.");
+            }
+            else
+            {
+                if (behaviorFeatures.Any(feature => feature.IsGeneratedDraft))
+                    sb.AppendLine("Generated scenarios are review-required drafts based on detected code routes, not verified business requirements. Authored Gherkin remains authoritative.\n");
+                sb.AppendLine($"- Features: {behaviorFeatures.Count}");
+                sb.AppendLine($"- Scenarios: {behaviorFeatures.Sum(feature => feature.Scenarios.Count)}");
+                sb.AppendLine($"- Draft scenarios: {behaviorFeatures.Sum(feature => feature.Scenarios.Count(scenario => scenario.IsGeneratedDraft))}");
+                foreach (var feature in behaviorFeatures.OrderBy(item => item.SourcePath, StringComparer.Ordinal))
+                {
+                    sb.AppendLine($"\n### {EscapeMarkdown(feature.Name)}{(feature.IsGeneratedDraft ? " (generated draft)" : string.Empty)}\n");
+                    sb.AppendLine($"Source: `{EscapeMarkdown(feature.SourcePath)}`\n");
+                    foreach (var scenario in feature.Scenarios)
+                    {
+                        var scenarioLabel = EscapeMarkdown(scenario.Name);
+                        if (scenario.IsGeneratedDraft)
+                            scenarioLabel += " (draft; review required)";
+                        sb.AppendLine($"- **{scenarioLabel}**");
+                        var related = scenario.RelatedSymbolIds
+                            .Where(symbolsById.ContainsKey)
+                            .Select(id => symbolsById[id])
+                            .Select(symbol => $"`{EscapeMarkdown(symbol.Name)}` ({EscapeMarkdown(symbol.FilePath)}:{symbol.Location.StartLine})")
+                            .ToArray();
+                        sb.AppendLine(related.Length == 0
+                            ? "  - Implementation link: not established from available evidence."
+                            : $"  - Implementation: {string.Join(", ", related)}");
+                        if (scenario.Tags.Count > 0)
+                            sb.AppendLine($"  - Tags: {string.Join(", ", scenario.Tags.Select(EscapeMarkdown))}");
+                    }
+                }
+            }
+
             sb.AppendLine("\n## Diagnostics\n");
             foreach (var diagnostic in model.Diagnostics)
                 sb.AppendLine($"- {diagnostic.Severity} `{diagnostic.Code}`: {diagnostic.Message}");
@@ -77,5 +139,8 @@ namespace CodeExplainer.Export.Markdown
 
             return sb.ToString();
         }
+
+        private static string EscapeMarkdown(string value) =>
+            value.Replace("|", "\\|").Replace("\r", " ").Replace("\n", " ");
     }
 }

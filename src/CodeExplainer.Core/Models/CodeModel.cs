@@ -27,7 +27,43 @@ namespace CodeExplainer.Core.Models
     public sealed record ProjectInfo(
         string? SolutionPath,
         IReadOnlyList<string> ProjectPaths,
-        IReadOnlyList<string> TypeScriptConfigPaths);
+        IReadOnlyList<string> TypeScriptConfigPaths)
+    {
+        public IReadOnlyList<RepositoryEvidence> Evidence { get; init; } = System.Array.Empty<RepositoryEvidence>();
+        public IReadOnlyList<BehaviorFeature> BehaviorFeatures { get; init; } = System.Array.Empty<BehaviorFeature>();
+        public IReadOnlyList<string> ConfigurationPaths { get; init; } = System.Array.Empty<string>();
+        public IReadOnlyList<string> BehaviorSpecPaths { get; init; } = System.Array.Empty<string>();
+    }
+
+    /// <summary>
+    /// A repository technology or infrastructure fact with its source and confidence.
+    /// </summary>
+    public sealed record RepositoryEvidence(
+        string Name,
+        string Category,
+        string SourcePath,
+        string EvidenceType,
+        string Confidence,
+        string? ProjectPath = null);
+
+    /// <summary>
+    /// A Gherkin feature found in the repository or generated as a reviewable draft.
+    /// </summary>
+    public sealed record BehaviorFeature(
+        string Name,
+        string SourcePath,
+        IReadOnlyList<BehaviorScenario> Scenarios,
+        bool IsGeneratedDraft = false);
+
+    /// <summary>
+    /// A scenario and its implementation links, when they can be established from evidence.
+    /// </summary>
+    public sealed record BehaviorScenario(
+        string Name,
+        IReadOnlyList<string> Tags,
+        IReadOnlyList<string> Steps,
+        IReadOnlyList<string> RelatedSymbolIds,
+        bool IsGeneratedDraft = false);
 
     /// <summary>
     /// Represents a symbol in the code (class, interface, function, component, etc.).

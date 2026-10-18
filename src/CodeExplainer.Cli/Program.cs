@@ -29,8 +29,8 @@ namespace CodeExplainer.Cli
             };
             var diagramOption = new Option<string>("--diagram", "-d")
             {
-                DefaultValueFactory = _ => "dependency,class",
-                Description = "Comma-separated diagram types: dependency, class, component, sequence"
+                DefaultValueFactory = _ => "architecture,modules,behavior,dependency,class,component,sequence",
+                Description = "Comma-separated diagram types: architecture, modules, behavior, dependency, class, component, sequence"
             };
             var workerOption = new Option<string>("--worker")
             {
