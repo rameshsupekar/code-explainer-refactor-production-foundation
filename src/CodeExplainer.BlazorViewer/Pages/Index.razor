@@ -1,0 +1,111 @@
+@page "/"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>CodeExplainer Viewer</PageTitle>
+
+<div class="toolbar">
+    <label>Folder to analyze</label>
+    <input @bind="folderPath" placeholder="./samples" />
+    <button class="primary" @onclick="AnalyzeAsync">Analyze</button>
+</div>
+
+@if (isLoading)
+{
+    <div class="status">Loading diagrams…</div>
+}
+
+@if (diagrams is not null)
+{
+    <div class="diagram-grid">
+        @foreach (var item in diagrams)
+        {
+            <article class="diagram-card">
+                <div class="diagram-header">
+                    <strong>@item.Name</strong>
+                    <span class="tag">@item.Type</span>
+                </div>
+
+                @if (item.Type == "mermaid")
+                {
+                    <pre class="diagram-text">@item.Content</pre>
+                    <div class="card-actions">
+                        <button @onclick="() => CopyTextAsync(item.Content)">Copy</button>
+                    </div>
+                }
+                else if (item.Type == "plantuml")
+                {
+                    <pre class="diagram-text">@item.Content</pre>
+                    <div class="card-actions">
+                        <button @onclick="() => CopyTextAsync(item.Content)">Copy</button>
+                    </div>
+                }
+                else if (item.Type == "svg")
+                {
+                    <iframe sandbox="allow-scripts" title="@item.Name" srcdoc="@item.Content" class="svg-frame"></iframe>
+                }
+                else
+                {
+                    <pre class="diagram-text">@item.Content</pre>
+                }
+            </article>
+        }
+    </div>
+}
+
+@code {
+    private string folderPath = "./src";
+    private bool isLoading;
+    private List<DiagramResult>? diagrams;
+
+    private async Task AnalyzeAsync()
+    {
+        isLoading = true;
+        diagrams = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/diagram/analyze", new { path = folderPath });
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                diagrams = new List<DiagramResult>
+                {
+                    new DiagramResult("error", "text", error)
+                };
+                return;
+            }
+
+            var payload = await response.Content.ReadFromJsonAsync<DiagramResponse>();
+            diagrams = payload?.Diagrams?.ToList() ?? new List<DiagramResult>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task CopyTextAsync(string value)
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", value);
+    }
+
+    private sealed class DiagramResponse
+    {
+        public List<DiagramResult>? Diagrams { get; set; }
+    }
+
+    private sealed class DiagramResult
+    {
+        public DiagramResult(string name, string type, string content)
+        {
+            Name = name;
+            Type = type;
+            Content = content;
+        }
+
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Content { get; set; }
+    }
+}

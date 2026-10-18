@@ -1,0 +1,113 @@
+html, body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f6f7fb;
+    color: #1f2937;
+}
+
+.page-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.topbar {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #dfe3eb;
+    margin-bottom: 20px;
+}
+
+.topbar h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.toolbar input {
+    flex: 1;
+    min-width: 280px;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(0.96);
+}
+
+.diagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.diagram-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.diagram-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+}
+
+.tag {
+    font-size: 0.75rem;
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 4px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+.diagram-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: Consolas, monospace;
+    min-height: 160px;
+    overflow-x: auto;
+}
+
+.svg-frame {
+    width: 100%;
+    min-height: 260px;
+    border: 0;
+    background: #ffffff;
+}
+
+.card-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.status {
+    margin: 12px 0 18px;
+    color: #4b5563;
+}
