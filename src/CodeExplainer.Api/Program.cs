@@ -3,8 +3,9 @@ using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Ensure logs directory exists
-var logsDir = Path.Combine(builder.Environment.ContentRootPath, "logs");
+// Use repository root logs folder (two levels up from API project folder)
+var repoRoot = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", ".."));
+var logsDir = Path.Combine(repoRoot, "logs");
 Directory.CreateDirectory(logsDir);
 
 builder.Services.AddControllers();
@@ -29,7 +30,7 @@ var app = builder.Build();
 // Security headers and CSP
 var csp = string.Join("; ", new[] {
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:" ,
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
     "connect-src 'self' http://127.0.0.1:5000 ws:",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
