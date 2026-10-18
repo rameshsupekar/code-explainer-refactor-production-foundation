@@ -1,8 +1,23 @@
 <Project>
   <PropertyGroup>
-    <!-- Central Package Management disabled to allow per-project PackageReference versions -->
+    <!-- Central Package Management disabled — use version properties so projects can reference $(...) -->
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+
+    <!-- Package version properties (use these in each project as Version="$(Package_Version)") -->
+    <Swashbuckle_AspNetCore_Version>6.5.0</Swashbuckle_AspNetCore_Version>
+    <Microsoft_AspNetCore_Components_WebAssembly_Version>8.0.0</Microsoft_AspNetCore_Components_WebAssembly_Version>
+    <Microsoft_AspNetCore_Components_WebAssembly_DevServer_Version>8.0.0</Microsoft_AspNetCore_Components_WebAssembly_DevServer_Version>
+    <Microsoft_CodeAnalysis_CSharp_Workspaces_Version>4.8.0</Microsoft_CodeAnalysis_CSharp_Workspaces_Version>
+    <Microsoft_Build_Locator_Version>1.11.2</Microsoft_Build_Locator_Version>
+    <System_CommandLine_Version>2.0.0</System_CommandLine_Version>
+    <Microsoft_NET_Test_Sdk_Version>18.11.0</Microsoft_NET_Test_Sdk_Version>
+    <Reqnroll_xUnit_Version>2.4.1</Reqnroll_xUnit_Version>
+    <Reqnroll_Tools_MsBuild_Generation_Version>2.4.1</Reqnroll_Tools_MsBuild_Generation_Version>
+    <xunit_Version>2.9.3</xunit_Version>
+    <xunit_runner_visualstudio_Version>4.0.1</xunit_runner_visualstudio_Version>
   </PropertyGroup>
+
+  <!-- Kept for reference; ignored while CPM is disabled -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.Build.Locator" Version="1.11.2" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
@@ -12,8 +27,6 @@
     <PackageVersion Include="Reqnroll.Tools.MsBuild.Generation" Version="2.4.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
-
-    <!-- Note: PackageVersion entries remain for reference but are ignored when CPM is disabled -->
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" />
