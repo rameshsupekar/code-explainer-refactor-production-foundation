@@ -14,14 +14,37 @@ public class DiagramController : ControllerBase
         _diagramService = diagramService;
     }
 
+    [HttpPost("diagram/analyze")]
     [HttpPost("analyze")]
     public async Task<IActionResult> Analyze([FromBody] AnalyzeRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Path))
             return BadRequest(new { error = "Path is required." });
 
-        var diagrams = await _diagramService.AnalyzeAsync(request.Path);
-        return Ok(new { diagrams });
+        try
+        {
+            var documents = await _diagramService.AnalyzeAsync(request.Path);
+            var diagrams = documents
+                .Where(document => document.Type is "mermaid" or "plantuml" or "svg")
+                .ToArray();
+            return Ok(new { documents, diagrams });
+        }
+        catch (DirectoryNotFoundException exception)
+        {
+            return NotFound(new { error = exception.Message });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "The document directory cannot be read." });
+        }
+        catch (InvalidDataException exception)
+        {
+            return StatusCode(StatusCodes.Status413PayloadTooLarge, new { error = exception.Message });
+        }
+        catch (ArgumentException exception)
+        {
+            return BadRequest(new { error = exception.Message });
+        }
     }
 }
 

@@ -1,0 +1,94 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="diagram-reader">
+    <div class="diagram-toolbar" aria-label="Diagram controls">
+        <button type="button" class="quiet-button" @onclick="ZoomOut" aria-label="Zoom out">−</button>
+        <button type="button" class="quiet-button" @onclick="FitDiagram">Fit width</button>
+        <button type="button" class="quiet-button" @onclick="ZoomIn" aria-label="Zoom in">+</button>
+        <button type="button" class="quiet-button" @onclick="TogglePan" aria-pressed="@panEnabled">@(panEnabled ? "Hand on" : "Hand")</button>
+        <button type="button" class="quiet-button" @onclick="CopySource">Copy source</button>
+    </div>
+
+    @if (renderError.Length > 0)
+    {
+        <div class="render-notice" role="status">@renderError</div>
+    }
+
+    <div class="diagram-viewport" aria-label="Scrollable diagram">
+        <div id="diagram-visual" class="diagram-visual"></div>
+    </div>
+
+    <details class="diagram-source">
+        <summary>View diagram source</summary>
+        <pre><code>@Source</code></pre>
+    </details>
+</div>
+
+@code {
+    [Parameter] public string Source { get; set; } = string.Empty;
+
+    private IJSObjectReference? module;
+    private string? lastRenderedSource;
+    private string renderError = string.Empty;
+    private bool panEnabled;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (lastRenderedSource == Source)
+            return;
+
+        try
+        {
+            module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/diagram-viewer.js");
+            renderError = await module.InvokeAsync<string>("renderMermaid", "diagram-visual", Source);
+            lastRenderedSource = Source;
+            StateHasChanged();
+        }
+        catch (JSException)
+        {
+            renderError = "The diagram renderer could not be loaded. Check network access, or use “View diagram source” below.";
+            lastRenderedSource = Source;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ZoomIn() => await InvokeDiagramControl("setDiagramZoom", 1.2);
+    private async Task ZoomOut() => await InvokeDiagramControl("setDiagramZoom", 1 / 1.2);
+    private async Task FitDiagram() => await InvokeDiagramControl("fitDiagram");
+
+    private async Task TogglePan()
+    {
+        panEnabled = !panEnabled;
+        await InvokeDiagramControl("setDiagramPanEnabled", panEnabled);
+    }
+
+    private async Task CopySource()
+    {
+        if (module is null)
+            return;
+
+        try
+        {
+            await module.InvokeVoidAsync("copyText", Source);
+            renderError = string.Empty;
+        }
+        catch (JSException)
+        {
+            renderError = "Clipboard access was denied by the browser. Select and copy the source from the section below.";
+        }
+    }
+
+    private async Task InvokeDiagramControl(string method, params object[] arguments)
+    {
+        if (module is null)
+            return;
+        await module.InvokeVoidAsync(method, new object[] { "diagram-visual" }.Concat(arguments).ToArray());
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+            await module.DisposeAsync();
+    }
+}

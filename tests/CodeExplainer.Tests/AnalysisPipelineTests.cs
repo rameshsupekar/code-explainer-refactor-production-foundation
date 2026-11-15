@@ -100,6 +100,8 @@ public sealed class AnalysisPipelineTests
             "export class CatalogClient { load(): Promise<string> { return Promise.resolve('catalog'); } }");
         await File.WriteAllTextAsync(Path.Combine(featureDirectory, "catalog.feature"),
             "Feature: Catalog API\n  Scenario: List catalog entries\n    When a GET request is sent to \"/api/catalog\"\n    Then GET /api/catalog returns catalog entries\n");
+        await File.WriteAllTextAsync(Path.Combine(featureDirectory, "z-catalog.feature"),
+            "Feature: ../../Catalog API\n  Scenario: Confirm safe generated documentation path\n    Then the generated feature page stays within the output directory\n");
 
         try
         {
@@ -126,6 +128,27 @@ public sealed class AnalysisPipelineTests
             Assert.Contains(outputFormat == "mermaid" ? "flowchart TB" : "@startuml", behaviorDiagram, StringComparison.Ordinal);
             Assert.Contains("List catalog entries", behaviorDiagram, StringComparison.Ordinal);
             Assert.Contains("CatalogController", behaviorDiagram, StringComparison.Ordinal);
+            var featureReadmePath = Path.Combine(outputDirectory, "features", "catalog-api", "README.md");
+            var featureReadme = await File.ReadAllTextAsync(featureReadmePath);
+            Assert.Contains("List catalog entries", featureReadme, StringComparison.Ordinal);
+            Assert.Contains("CatalogController", featureReadme, StringComparison.Ordinal);
+            Assert.Contains("[`behavior", featureReadme, StringComparison.Ordinal);
+            Assert.Contains(featureReadmePath, result.OutputFiles);
+            var featureDiagramPath = Path.Combine(outputDirectory, "features", "catalog-api", $"behavior{diagramExtension}");
+            var featureDiagram = await File.ReadAllTextAsync(featureDiagramPath);
+            Assert.Contains("List catalog entries", featureDiagram, StringComparison.Ordinal);
+            Assert.Contains(featureDiagramPath, result.OutputFiles);
+
+            var duplicateFeatureReadme = Path.Combine(outputDirectory, "features", "catalog-api-2", "README.md");
+            Assert.True(File.Exists(duplicateFeatureReadme));
+            Assert.Contains("Confirm safe generated documentation path",
+                await File.ReadAllTextAsync(duplicateFeatureReadme), StringComparison.Ordinal);
+
+            var draftReadme = await File.ReadAllTextAsync(Path.Combine(
+                outputDirectory, "features", "detected-api-endpoint-behavior-drafts", "README.md"));
+            Assert.Contains("review", draftReadme, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("CatalogController", draftReadme, StringComparison.Ordinal);
+
             var architectureDiagram = await File.ReadAllTextAsync(Path.Combine(outputDirectory, $"architecture{diagramExtension}"));
             Assert.Contains(outputFormat == "mermaid" ? "flowchart TB" : "@startuml", architectureDiagram, StringComparison.Ordinal);
             Assert.Contains("Azure resource azurerm_storage_account", architectureDiagram, StringComparison.Ordinal);
@@ -138,6 +161,7 @@ public sealed class AnalysisPipelineTests
             Assert.Contains(".NET net10.0", summary, StringComparison.Ordinal);
             Assert.Contains("BDD behavior and implementation traceability", summary, StringComparison.Ordinal);
             Assert.Contains("CatalogController", summary, StringComparison.Ordinal);
+            Assert.Contains("[Catalog API](./features/catalog-api/README.md)", summary, StringComparison.Ordinal);
             Assert.DoesNotContain("must-not-appear-in-output", summary, StringComparison.Ordinal);
         }
         finally

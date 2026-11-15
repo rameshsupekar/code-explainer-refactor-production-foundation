@@ -9,56 +9,95 @@ public sealed record DiagramDetail(string Name, string Type, string Content, str
 
 public sealed class LocalDiagramService : IDiagramService
 {
+    private const int MaximumDocumentCount = 1000;
+    private const long MaximumDocumentBytes = 5 * 1024 * 1024;
+    private const long MaximumTotalDocumentBytes = 20 * 1024 * 1024;
+    private static readonly HashSet<string> IgnoredDirectories = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".git", "node_modules", "bin", "obj", "dist", "build", ".angular"
+    };
+
     public Task<IEnumerable<DiagramDetail>> AnalyzeAsync(string path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            return Task.FromResult<IEnumerable<DiagramDetail>>(Array.Empty<DiagramDetail>());
-
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
         var target = Path.GetFullPath(path);
         if (!Directory.Exists(target))
+            throw new DirectoryNotFoundException($"Document directory not found: {path}");
+
+        var documents = new List<DiagramDetail>();
+        long totalDocumentBytes = 0;
+        var pendingDirectories = new Stack<string>();
+        pendingDirectories.Push(target);
+
+        while (pendingDirectories.TryPop(out var directory))
         {
-            var fallback = new[]
+            foreach (var subdirectory in Directory.EnumerateDirectories(directory))
             {
-                new DiagramDetail("analysis-error", "text", $"Directory not found: {path}")
-            };
-            return Task.FromResult<IEnumerable<DiagramDetail>>(fallback);
+                if (!IgnoredDirectories.Contains(Path.GetFileName(subdirectory)))
+                    pendingDirectories.Push(subdirectory);
+            }
+
+            foreach (var file in Directory.EnumerateFiles(directory))
+            {
+                var extension = Path.GetExtension(file).ToLowerInvariant();
+                if (!TryGetDocumentType(extension, out var type))
+                    continue;
+
+                if (documents.Count == MaximumDocumentCount)
+                    throw new InvalidDataException($"The document folder contains more than {MaximumDocumentCount} supported files.");
+
+                var fileInfo = new FileInfo(file);
+                if (fileInfo.Length > MaximumDocumentBytes)
+                    throw new InvalidDataException($"Document exceeds the 5 MB limit: {Path.GetRelativePath(target, file)}");
+                totalDocumentBytes += fileInfo.Length;
+                if (totalDocumentBytes > MaximumTotalDocumentBytes)
+                    throw new InvalidDataException("The selected guide exceeds the 20 MB total size limit.");
+
+                var relativePath = Path.GetRelativePath(target, file).Replace('\\', '/');
+                var content = type.StartsWith("image/", StringComparison.Ordinal)
+                    ? $"data:{type};base64,{Convert.ToBase64String(File.ReadAllBytes(file))}"
+                    : File.ReadAllText(file);
+                documents.Add(new DiagramDetail(Path.GetFileName(file), type, content, relativePath));
+            }
         }
 
-        var diagrams = new List<DiagramDetail>();
+        var orderedDocuments = documents
+            .OrderBy(document => GetDocumentOrder(document), StringComparer.Ordinal)
+            .ThenBy(document => document.SourcePath, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+        return Task.FromResult<IEnumerable<DiagramDetail>>(orderedDocuments);
+    }
 
-        var files = Directory.EnumerateFiles(target, "*.*", SearchOption.AllDirectories)
-            .Where(file => file.EndsWith(".mmd", StringComparison.OrdinalIgnoreCase)
-                || file.EndsWith(".mermaid", StringComparison.OrdinalIgnoreCase)
-                || file.EndsWith(".puml", StringComparison.OrdinalIgnoreCase)
-                || file.EndsWith(".plantuml", StringComparison.OrdinalIgnoreCase)
-                || file.EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
-            .OrderBy(file => file, StringComparer.OrdinalIgnoreCase);
-
-        foreach (var file in files)
+    private static bool TryGetDocumentType(string extension, out string type)
+    {
+        type = extension switch
         {
-            var content = File.ReadAllText(file);
-            var extension = Path.GetExtension(file).ToLowerInvariant();
+            ".md" => "markdown",
+            ".mmd" or ".mermaid" => "mermaid",
+            ".puml" or ".plantuml" => "plantuml",
+            ".svg" => "svg",
+            ".png" => "image/png",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            _ => string.Empty
+        };
+        return type.Length > 0;
+    }
 
-            if (extension is ".mmd" or ".mermaid")
-            {
-                diagrams.Add(new DiagramDetail(Path.GetFileName(file), "mermaid", content, file));
-            }
-            else if (extension is ".puml" or ".plantuml")
-            {
-                diagrams.Add(new DiagramDetail(Path.GetFileName(file), "plantuml", content, file));
-            }
-            else if (extension is ".svg")
-            {
-                diagrams.Add(new DiagramDetail(Path.GetFileName(file), "svg", content, file));
-            }
-        }
-
-        if (diagrams.Count == 0)
+    private static string GetDocumentOrder(DiagramDetail document)
+    {
+        if (document.Type == "markdown" &&
+            (string.Equals(Path.GetFileName(document.SourcePath), "architecture.md", StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(Path.GetFileName(document.SourcePath), "README.md", StringComparison.OrdinalIgnoreCase)))
+            return "0";
+        return document.Type switch
         {
-            diagrams.Add(new DiagramDetail("sample-mermaid", "mermaid", "graph LR\n    A[Input] --> B[Analyzer]\n    B --> C[Diagram]"));
-            diagrams.Add(new DiagramDetail("sample-plantuml", "plantuml", "@startuml\nUser -> Analyzer: analyze\nAnalyzer -> Diagram: export\n@enduml"));
-        }
-
-        return Task.FromResult<IEnumerable<DiagramDetail>>(diagrams);
+            "markdown" => "1",
+            "mermaid" => "2",
+            "svg" => "3",
+            "plantuml" => "4",
+            _ => "5"
+        };
     }
 }

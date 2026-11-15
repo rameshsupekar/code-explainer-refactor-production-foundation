@@ -104,7 +104,7 @@ flowchart LR
 | `TypeScriptAnalyzer` + Node worker | Exchange request/response and analyze TS/JS/HTML | Node process receives root-relative file paths; worker rejects paths outside root, can report parse/static-analysis diagnostics, and has timeout/error handling. |
 | `RelationshipBuilder` | Link dependency metadata and matching literal HTTP request/endpoint pairs | Ambiguous/unmatched route/dependency evidence produces diagnostics rather than an assumed link. |
 | `BehaviorFeatureBuilder` | Parse feature/scenario/steps/tags, relate route/action/name evidence, create endpoint drafts | Authored scenarios remain non-drafts; inferred endpoint scenarios carry review-required tags; route-related endpoint links now include the owning controller when available. |
-| Exporters | Render text artifacts | Markdown summary plus selected Mermaid/PlantUML diagrams; output paths are constrained to the output directory for generated Gherkin drafts. |
+| Exporters | Render text artifacts | Markdown summary plus selected Mermaid/PlantUML diagrams; selecting `behavior` also writes a linked per-feature README and behavior diagram under `features/<slug>/`; generated feature and diagram paths stay under the output directory. |
 
 ## 3. Behavior scenarios and implementation traceability
 
@@ -149,5 +149,5 @@ These scenarios are representative, executable contracts for the currently disco
 - **TypeScript worker:** `workers/typescript-analyzer/package.json` declares TypeScript `^5.3.0`; TypeScript compiler options select ES2021/CommonJS and strict mode. Cucumber.js is a development dependency and `npm run test:bdd` builds before executing feature files.
 - **BDD .NET runner:** `Reqnroll.xUnit` 2.4.1 and xUnit 2.9.3 are centrally versioned. The CLI feature is linked as a `ReqnrollFeature` into the test project.
 - **Worker selection:** explicit CLI `--worker`; `CODEEXPLAINER_TYPESCRIPT_WORKER`; or workspace-relative built worker discovery. `CODEEXPLAINER_NODE_PATH` can override `node`. Worker timeout is 30,000 ms by default in `AnalysisOptions`.
-- **Output:** default directory `./generated`; generated endpoint feature drafts are written under `behavior/drafts`; output diagram extensions are `.mmd` or `.puml`; summary is `architecture.md`.
+- **Output:** default directory `./generated`; generated endpoint feature drafts are written under `behavior/drafts`; output diagram extensions are `.mmd` or `.puml`; summary is `architecture.md`; selecting `behavior` also writes links in the summary to `features/<slug>/README.md` pages and matching feature-specific behavior diagrams.
 - **Not evidenced as runtime services:** no persistent database, hosted web endpoint, authentication/authorization service, broker, cache, cloud account, deployment target, or scheduler is part of the analyzer process. The scanner can report evidence for some of these in arbitrary analyzed repositories, but configuration-key matches are inferences, not proof of a live service.

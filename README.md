@@ -71,10 +71,15 @@ code-explainer analyze ./repository \
 ```
 
 ### Output Files
-- `analysis.json` - Complete code model
-- `dependencies.mmd` - Dependency diagram
-- `classes.mmd` - Class diagram
-- `summary.md` - Markdown documentation
+- `architecture.md` - Repository-wide source, symbol, relationship, evidence, and behavior summary
+- `<diagram>.mmd` or `<diagram>.puml` - One file for each selected diagram type
+- `features/<feature-name>/README.md` - Pointwise scenario steps and evidence-linked implementation for each behavior feature
+- `features/<feature-name>/behavior.mmd` or `behavior.puml` - The matching feature-specific behavior diagram
+- `behavior/drafts/api-endpoints.feature` - Review-required endpoint scenarios when API endpoints are detected
+
+The `architecture.md` summary links to feature README files and diagrams generated when `behavior`
+is included in `--diagram`. Feature directory names are normalized and made unique; generated
+scenario links are evidence-based and do not claim to represent every runtime path or business requirement.
 
 ## Development Milestones
 
@@ -140,7 +145,7 @@ code-explainer analyze ./repository \
 ## Getting Started
 
 ### Prerequisites
-- .NET 8.0 SDK
+- .NET 10 SDK
 - Node.js 18+ (for TypeScript worker)
 
 ### Build
@@ -168,7 +173,7 @@ dotnet run --project src/CodeExplainer.Api --urls "http://127.0.0.1:5000"
 Start the Blazor dev server (ports 5002/5003):
 
 ```bash
-dotnet run --project src/CodeExplainer.BlazorViewer --urls "http://127.0.0.1:5002;https://127.0.0.1:5003"
+dotnet run --project src/CodeExplainer.BlazorViewer --urls "http://127.0.0.1:5002"
 ```
 
 Start Angular (uses proxy to forward /api to backend):
@@ -182,6 +187,17 @@ npm run start
 Open:
 - Angular: http://localhost:4200
 - Blazor: http://127.0.0.1:5002
+
+The Blazor reader opens the output folder (for example `./generated`) and presents Markdown pages,
+Mermaid diagrams, SVGs, and exported images in a searchable table of contents. Mermaid previews use
+the pinned Mermaid browser module from jsDelivr; diagram source remains available if that module
+cannot be reached. Mermaid, SVG, and raster image views include zoom, fit-width, and optional
+hand-drag panning controls; diagrams open at their natural scale so labels remain readable.
+PlantUML files are shown as source. Raster images link to a matching vector source when one is
+available for crisp zooming. For another
+deployment, set `ApiBaseUrl` in
+`src/CodeExplainer.BlazorViewer/wwwroot/appsettings.json` to the API's absolute URL. The API CORS
+policy must allow the viewer's origin.
 
 ## Production build & AOT (Blazor)
 

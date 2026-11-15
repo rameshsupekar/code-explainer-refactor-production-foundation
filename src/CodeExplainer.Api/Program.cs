@@ -30,8 +30,8 @@ var app = builder.Build();
 // Security headers and CSP
 var csp = string.Join("; ", new[] {
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:",
-    "connect-src 'self' http://127.0.0.1:5000 ws:",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net",
+    "connect-src 'self' http://127.0.0.1:5000 https://cdn.jsdelivr.net ws:",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",

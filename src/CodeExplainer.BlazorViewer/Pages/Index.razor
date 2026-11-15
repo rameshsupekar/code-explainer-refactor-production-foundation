@@ -1,83 +1,288 @@
 @page "/"
+@using System.Text.Json.Serialization
 @inject HttpClient Http
-@inject IJSRuntime JS
 
-<PageTitle>CodeExplainer Viewer</PageTitle>
+<PageTitle>CodeExplainer | Project guide</PageTitle>
 
-<div class="toolbar">
-    <label>Folder to analyze</label>
-    <input @bind="folderPath" placeholder="./samples" />
-    <button class="primary" @onclick="AnalyzeAsync">Analyze</button>
-</div>
+<div class="workspace">
+    <header class="app-header">
+        <a class="brand" href="/" aria-label="CodeExplainer home">
+            <span class="brand-mark" aria-hidden="true">C</span>
+            <span>
+                <strong>CodeExplainer</strong>
+                <small>Project guide</small>
+            </span>
+        </a>
 
-@if (isLoading)
-{
-    <div class="status">Loading diagrams…</div>
-}
+        <form class="load-form" @onsubmit="LoadDocumentsAsync" @onsubmit:preventDefault>
+            <label for="document-path">Generated documentation folder</label>
+            <div class="load-controls">
+                <input id="document-path" @bind="folderPath" autocomplete="off" spellcheck="false" />
+                <button class="primary-button" type="submit" disabled="@isLoading">
+                    @(isLoading ? "Loading…" : "Open guide")
+                </button>
+            </div>
+        </form>
+    </header>
 
-@if (diagrams is not null)
-{
-    <div class="diagram-grid">
-        @foreach (var item in diagrams)
-        {
-            <article class="diagram-card">
-                <div class="diagram-header">
-                    <strong>@item.Name</strong>
-                    <span class="tag">@item.Type</span>
+    @if (errorMessage.Length > 0)
+    {
+        <div class="notice notice-error" role="alert">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="welcome-panel loading-panel" role="status">
+            <span class="loading-indicator" aria-hidden="true"></span>
+            <div>
+                <h1>Opening your project guide</h1>
+                <p>Loading Markdown pages and diagrams from <code>@folderPath</code>.</p>
+            </div>
+        </div>
+    }
+    else if (documents is null)
+    {
+        <section class="welcome-panel">
+            <p class="eyebrow">A guided view of your generated output</p>
+            <h1>Read the project, one page at a time.</h1>
+            <p>Open a CodeExplainer output folder to browse its architecture summary, feature notes, and diagrams together.</p>
+            <ol class="getting-started">
+                <li>Run CodeExplainer with <code>--diagram architecture,modules,behavior,dependency,class,component,sequence</code>.</li>
+                <li>Enter the generated output folder above, such as <code>./generated</code>.</li>
+                <li>Open the guide to navigate the written overview and visual diagrams.</li>
+            </ol>
+            <button class="primary-button" type="button" @onclick="LoadDocumentsAsync">Open ./generated</button>
+        </section>
+    }
+    else if (documents.Count == 0)
+    {
+        <section class="welcome-panel empty-panel">
+            <p class="eyebrow">No documents found</p>
+            <h1>This folder has no supported guide files.</h1>
+            <p>Choose an output folder containing Markdown files, Mermaid or PlantUML diagrams, SVGs, or exported images.</p>
+        </section>
+    }
+    else
+    {
+        <div class="reader-layout">
+            <aside class="contents-panel" aria-label="Guide contents">
+                <div class="contents-heading">
+                    <div>
+                        <p class="eyebrow">CONTENTS</p>
+                        <h2>Project guide</h2>
+                    </div>
+                    <span class="document-count">@documents.Count</span>
                 </div>
 
-                @if (item.Type == "mermaid")
+                <label class="search-label" for="contents-search">Find a page</label>
+                <input id="contents-search" class="search-input" type="search" @bind="searchText" @bind:event="oninput" placeholder="Search pages and diagrams" />
+
+                @if (VisibleDocuments.Any(document => document.Type == "markdown"))
                 {
-                    <pre class="diagram-text">@item.Content</pre>
-                    <div class="card-actions">
-                        <button @onclick="() => CopyTextAsync(item.Content)">Copy</button>
+                    <h3 class="contents-group-title">READING GUIDE</h3>
+                    <nav class="contents-list" aria-label="Reading guide">
+                        @foreach (var document in VisibleDocuments.Where(document => document.Type == "markdown"))
+                        {
+                            <button type="button"
+                                    class="contents-item @(IsSelected(document) ? "selected" : string.Empty)"
+                                    aria-current="@(IsSelected(document) ? "page" : null)"
+                                    @onclick="() => SelectDocument(document)">
+                                <span class="contents-item-icon" aria-hidden="true">¶</span>
+                                <span class="contents-item-copy">
+                                    <strong>@GetDisplayName(document)</strong>
+                                    <small>@document.SourcePath</small>
+                                </span>
+                            </button>
+                        }
+                    </nav>
+                }
+
+                @if (VisibleDocuments.Any(document => document.Type != "markdown"))
+                {
+                    <h3 class="contents-group-title">DIAGRAMS &amp; IMAGES</h3>
+                    <nav class="contents-list" aria-label="Diagrams and images">
+                        @foreach (var document in VisibleDocuments.Where(document => document.Type != "markdown"))
+                        {
+                            <button type="button"
+                                    class="contents-item @(IsSelected(document) ? "selected" : string.Empty)"
+                                    aria-current="@(IsSelected(document) ? "page" : null)"
+                                    @onclick="() => SelectDocument(document)">
+                                <span class="contents-item-icon diagram-icon" aria-hidden="true">◇</span>
+                                <span class="contents-item-copy">
+                                    <strong>@GetDisplayName(document)</strong>
+                                    <small>@document.SourcePath</small>
+                                </span>
+                            </button>
+                        }
+                    </nav>
+                }
+
+                @if (!VisibleDocuments.Any())
+                {
+                    <p class="no-search-results">No matching pages. Try a shorter search.</p>
+                }
+            </aside>
+
+            <main class="reading-pane">
+                @if (selectedDocument is not null)
+                {
+                    <div class="reader-toolbar">
+                        <div class="breadcrumbs">
+                            <span>PROJECT GUIDE</span>
+                            <span aria-hidden="true">/</span>
+                            <span>@GetDisplayName(selectedDocument)</span>
+                        </div>
+                        <div class="page-navigation">
+                            <button type="button" class="quiet-button" @onclick="SelectPrevious" disabled="@IsFirstDocument" aria-label="Previous page">←</button>
+                            <span>@(SelectedDocumentIndex + 1) / @documents.Count</span>
+                            <button type="button" class="quiet-button" @onclick="SelectNext" disabled="@IsLastDocument" aria-label="Next page">→</button>
+                        </div>
                     </div>
+
+                    @if (linkMessage.Length > 0)
+                    {
+                        <p class="link-notice" role="status">@linkMessage</p>
+                    }
+
+                    @if (selectedDocument.Type == "markdown")
+                    {
+                        <article class="page-sheet">
+                            <div class="page-meta">
+                                <span class="type-pill">DOCUMENT</span>
+                                <span>@selectedDocument.SourcePath</span>
+                            </div>
+                            <MarkdownDocument Content="@selectedDocument.Content"
+                                              SourcePath="@selectedDocument.SourcePath"
+                                              ImageSources="ImageSources"
+                                              OnDocumentLink="OpenDocumentLinkAsync" />
+                        </article>
+                    }
+                    else if (selectedDocument.Type == "mermaid")
+                    {
+                        <article class="page-sheet diagram-sheet">
+                            <div class="page-meta">
+                                <span class="type-pill diagram-pill">MERMAID DIAGRAM</span>
+                                <span>@selectedDocument.SourcePath</span>
+                            </div>
+                            <h1 class="visual-title">@GetDisplayName(selectedDocument)</h1>
+                            <DiagramDocument Source="@selectedDocument.Content" />
+                        </article>
+                    }
+                    else if (selectedDocument.Type == "svg")
+                    {
+                        <article class="page-sheet diagram-sheet">
+                            <div class="page-meta">
+                                <span class="type-pill diagram-pill">SVG DIAGRAM</span>
+                                <span>@selectedDocument.SourcePath</span>
+                            </div>
+                            <h1 class="visual-title">@GetDisplayName(selectedDocument)</h1>
+                            <ImageDocument Source="@ToSvgDataUri(selectedDocument.Content)"
+                                           Alt="@GetDisplayName(selectedDocument)"
+                                           SvgSource="@selectedDocument.Content" />
+                            <details class="diagram-source">
+                                <summary>View SVG source</summary>
+                                <pre><code>@selectedDocument.Content</code></pre>
+                            </details>
+                        </article>
+                    }
+                    else if (selectedDocument.Type.StartsWith("image/", StringComparison.Ordinal))
+                    {
+                        <article class="page-sheet diagram-sheet">
+                            <div class="page-meta">
+                                <span class="type-pill diagram-pill">EXPORTED IMAGE</span>
+                                <span>@selectedDocument.SourcePath</span>
+                            </div>
+                            <h1 class="visual-title">@GetDisplayName(selectedDocument)</h1>
+                            <ImageDocument Source="@selectedDocument.Content"
+                                           Alt="@GetDisplayName(selectedDocument)"
+                                           HasVectorAlternative="@(FindVectorAlternative(selectedDocument) is not null)"
+                                           OnOpenVectorAlternative="OpenVectorAlternativeAsync" />
+                        </article>
+                    }
+                    else
+                    {
+                        <article class="page-sheet diagram-sheet">
+                            <div class="page-meta">
+                                <span class="type-pill diagram-pill">PLANTUML SOURCE</span>
+                                <span>@selectedDocument.SourcePath</span>
+                            </div>
+                            <h1 class="visual-title">@GetDisplayName(selectedDocument)</h1>
+                            <p class="source-notice">This is PlantUML source. Choose Mermaid output in CodeExplainer for an interactive visual preview.</p>
+                            <pre class="source-view"><code>@selectedDocument.Content</code></pre>
+                        </article>
+                    }
                 }
-                else if (item.Type == "plantuml")
-                {
-                    <pre class="diagram-text">@item.Content</pre>
-                    <div class="card-actions">
-                        <button @onclick="() => CopyTextAsync(item.Content)">Copy</button>
-                    </div>
-                }
-                else if (item.Type == "svg")
-                {
-                    <iframe sandbox="allow-scripts" title="@item.Name" srcdoc="@item.Content" class="svg-frame"></iframe>
-                }
-                else
-                {
-                    <pre class="diagram-text">@item.Content</pre>
-                }
-            </article>
-        }
-    </div>
-}
+            </main>
+        </div>
+    }
+</div>
 
 @code {
-    private string folderPath = "./src";
+    private string folderPath = "./generated";
+    private string searchText = string.Empty;
+    private string errorMessage = string.Empty;
+    private string linkMessage = string.Empty;
     private bool isLoading;
-    private List<DiagramResult>? diagrams;
+    private List<ViewerDocument>? documents;
+    private ViewerDocument? selectedDocument;
 
-    private async Task AnalyzeAsync()
+    private IReadOnlyDictionary<string, string> ImageSources =>
+        (documents ?? [])
+            .Where(document => document.Type.StartsWith("image/", StringComparison.Ordinal))
+            .ToDictionary(
+                document => document.SourcePath.Replace('\\', '/'),
+                document => document.Content,
+                StringComparer.OrdinalIgnoreCase);
+
+    private IEnumerable<ViewerDocument> VisibleDocuments =>
+        (documents ?? []).Where(document =>
+            searchText.Length == 0 ||
+            document.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            (document.SourcePath?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    private int SelectedDocumentIndex => selectedDocument is null || documents is null
+        ? 0
+        : documents.FindIndex(document => document.SourcePath == selectedDocument.SourcePath);
+    private bool IsFirstDocument => SelectedDocumentIndex <= 0;
+    private bool IsLastDocument => documents is null || SelectedDocumentIndex >= documents.Count - 1;
+
+    private async Task LoadDocumentsAsync()
     {
-        isLoading = true;
-        diagrams = null;
+        if (string.IsNullOrWhiteSpace(folderPath))
+        {
+            errorMessage = "Enter the path to a generated documentation folder.";
+            return;
+        }
 
+        isLoading = true;
+        errorMessage = string.Empty;
+        linkMessage = string.Empty;
+        documents = null;
+        selectedDocument = null;
         try
         {
-            var response = await Http.PostAsJsonAsync("api/diagram/analyze", new { path = folderPath });
+            using var response = await Http.PostAsJsonAsync("api/diagram/analyze", new { path = folderPath });
             if (!response.IsSuccessStatusCode)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                diagrams = new List<DiagramResult>
-                {
-                    new DiagramResult("error", "text", error)
-                };
+                var body = await response.Content.ReadAsStringAsync();
+                errorMessage = TryGetErrorMessage(body) ?? $"Could not open this folder (HTTP {(int)response.StatusCode}).";
                 return;
             }
 
-            var payload = await response.Content.ReadFromJsonAsync<DiagramResponse>();
-            diagrams = payload?.Diagrams?.ToList() ?? new List<DiagramResult>();
+            var result = await response.Content.ReadFromJsonAsync<AnalyzeResponse>();
+            documents = result?.Documents ?? [];
+            selectedDocument = documents.FirstOrDefault(document =>
+                document.Type == "markdown" && Path.GetFileName(document.SourcePath) == "architecture.md")
+                ?? documents.FirstOrDefault(document => document.Type == "markdown")
+                ?? documents.FirstOrDefault();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "The CodeExplainer API could not be reached. Start the API and check its configured URL.";
+        }
+        catch (UriFormatException)
+        {
+            errorMessage = "The folder path could not be resolved. Check that the path is valid.";
         }
         finally
         {
@@ -85,27 +290,140 @@
         }
     }
 
-    private async Task CopyTextAsync(string value)
+    private void SelectDocument(ViewerDocument document)
     {
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText", value);
+        selectedDocument = document;
+        linkMessage = string.Empty;
     }
 
-    private sealed class DiagramResponse
+    private ViewerDocument? FindVectorAlternative(ViewerDocument image)
     {
-        public List<DiagramResult>? Diagrams { get; set; }
+        if (documents is null)
+            return null;
+
+        var stem = Path.ChangeExtension(image.SourcePath, null)?.Replace('\\', '/');
+        if (stem is null)
+            return null;
+
+        var vectorPaths = new[] { $"{stem}.mmd", $"{stem}.mermaid", $"{stem}.svg" };
+        return documents.FirstOrDefault(document =>
+            (document.Type is "mermaid" or "svg") &&
+            vectorPaths.Contains(document.SourcePath.Replace('\\', '/'), StringComparer.OrdinalIgnoreCase));
     }
 
-    private sealed class DiagramResult
+    private Task OpenVectorAlternativeAsync()
     {
-        public DiagramResult(string name, string type, string content)
+        if (selectedDocument is not null && FindVectorAlternative(selectedDocument) is { } vectorDocument)
+            SelectDocument(vectorDocument);
+
+        return Task.CompletedTask;
+    }
+
+    private void SelectPrevious()
+    {
+        if (documents is not null && SelectedDocumentIndex > 0)
+            SelectDocument(documents[SelectedDocumentIndex - 1]);
+    }
+
+    private void SelectNext()
+    {
+        if (documents is not null && SelectedDocumentIndex < documents.Count - 1)
+            SelectDocument(documents[SelectedDocumentIndex + 1]);
+    }
+
+    private Task OpenDocumentLinkAsync(string href)
+    {
+        if (selectedDocument is null || documents is null || href.StartsWith('#'))
+            return Task.CompletedTask;
+
+        try
         {
-            Name = name;
-            Type = type;
-            Content = content;
+            var linkedPath = Uri.UnescapeDataString(href).Split('?', '#')[0];
+            if (string.IsNullOrWhiteSpace(linkedPath) || linkedPath.StartsWith('/') || linkedPath.Contains(':'))
+            {
+                linkMessage = "This link is not a relative document path.";
+                return Task.CompletedTask;
+            }
+
+            var pathParts = (Path.GetDirectoryName(selectedDocument.SourcePath.Replace('/', Path.DirectorySeparatorChar)) ?? string.Empty)
+                .Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+            foreach (var part in linkedPath.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (part == ".")
+                    continue;
+                if (part == "..")
+                {
+                    if (pathParts.Count == 0)
+                    {
+                        linkMessage = "This link points outside the loaded documentation folder.";
+                        return Task.CompletedTask;
+                    }
+                    pathParts.RemoveAt(pathParts.Count - 1);
+                }
+                else
+                {
+                    pathParts.Add(part);
+                }
+            }
+
+            var relativePath = string.Join('/', pathParts);
+            var target = documents.FirstOrDefault(document =>
+                string.Equals(document.SourcePath, relativePath, StringComparison.OrdinalIgnoreCase));
+            if (target is null)
+                linkMessage = $"That linked file is not included in this guide: {relativePath}";
+            else
+                SelectDocument(target);
+        }
+        catch (ArgumentException)
+        {
+            linkMessage = "This document link is not a valid local path.";
         }
 
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Content { get; set; }
+        return Task.CompletedTask;
+    }
+
+    private static string GetDisplayName(ViewerDocument document) =>
+        Path.GetFileNameWithoutExtension(document.Name).Replace('-', ' ').Replace('_', ' ');
+
+    private static string ToSvgDataUri(string content) =>
+        $"data:image/svg+xml;base64,{Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(content))}";
+
+    private bool IsSelected(ViewerDocument document) =>
+        selectedDocument?.SourcePath == document.SourcePath;
+
+    private static string? TryGetErrorMessage(string body)
+    {
+        try
+        {
+            return System.Text.Json.JsonDocument.Parse(body).RootElement.TryGetProperty("error", out var message)
+                ? message.GetString()
+                : null;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return null;
+        }
+    }
+
+    private sealed class AnalyzeResponse
+    {
+        [JsonPropertyName("documents")]
+        public List<ViewerDocument>? Documents { get; set; }
+    }
+
+    private sealed class ViewerDocument
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("type")]
+        public string Type { get; set; } = string.Empty;
+
+        [JsonPropertyName("content")]
+        public string Content { get; set; } = string.Empty;
+
+        [JsonPropertyName("sourcePath")]
+        public string SourcePath { get; set; } = string.Empty;
     }
 }

@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\src\CodeExplainer.Core\CodeExplainer.Core.csproj" />
     <ProjectReference Include="..\..\src\CodeExplainer.Analyzers.CSharp\CodeExplainer.Analyzers.CSharp.csproj" />
     <ProjectReference Include="..\..\src\CodeExplainer.Export.Mermaid\CodeExplainer.Export.Mermaid.csproj" />
+    <ProjectReference Include="..\..\src\CodeExplainer.Api\CodeExplainer.Api.csproj" />
   </ItemGroup>
 
 </Project>

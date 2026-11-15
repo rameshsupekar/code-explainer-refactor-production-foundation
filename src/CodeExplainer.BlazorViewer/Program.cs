@@ -7,9 +7,10 @@ using CodeExplainer.BlazorViewer;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 
-builder.Services.AddScoped(sp => new HttpClient
+var apiBaseAddress = builder.Configuration["ApiBaseUrl"] ?? "http://127.0.0.1:5000/";
+builder.Services.AddScoped(_ => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:5001/")
+    BaseAddress = new Uri(apiBaseAddress, UriKind.Absolute)
 });
 
 await builder.Build().RunAsync();
