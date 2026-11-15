@@ -2,7 +2,7 @@
 
 ## Scope and evidence
 
-This describes the repository's implemented analyzer and its local execution boundary, based on `src/CodeExplainer.Cli/Program.cs`, `AnalysisPipeline.cs`, `CodeExplainer.Cli.csproj`, the analyzer/scanner/exporter projects, `workers/typescript-analyzer/package.json`, and `Directory.Packages.props`. It is not a design for a deployed product: the repository contains a command-line process, local file scanning, and a Node.js worker subprocess. No hosted API, interactive UI, database, cache, message broker, cloud deployment, or independent background-job service was found. A scanned target may contain such infrastructure; those are input evidence rather than CodeExplainer runtime dependencies.
+This describes the repository's implemented analyzer and its local execution boundary, based on `src/CodeExplainer.Cli/Program.cs`, `AnalysisPipeline.cs`, `CodeExplainer.Cli.csproj`, the analyzer/scanner/exporter projects, `workers/typescript-analyzer/package.json`, and `Directory.Packages.props`. The repository also contains API and viewer projects; the current API service reads existing diagram files and does not invoke the analysis pipeline. The CLI analysis path consists of a local .NET process, file scanning, and a Node.js worker subprocess. No deployed service, database, cache, message broker, cloud deployment, or independent background-job service was found. A scanned target may contain such infrastructure; those are input evidence rather than CodeExplainer runtime dependencies.
 
 ## System context and runtime topology
 
@@ -23,9 +23,11 @@ flowchart LR
 	MODEL --> EXPORT[Exporters]
 	GHERKIN --> EXPORT
 	EXPORT --> MD[architecture.md]
+	EXPORT --> FEATUREDOCS[Per-feature README + behavior diagram]
 	EXPORT --> MER[Mermaid diagrams]
 	EXPORT --> PU[PlantUML diagrams]
 	MD --> OUT[(Local output directory)]
+	FEATUREDOCS --> OUT
 	MER --> OUT
 	PU --> OUT
 ```
@@ -67,6 +69,7 @@ Discovery recognizes `.cs`, `.ts`, `.tsx`, `.js`, `.jsx`, and `.html`; default i
 - The TypeScript worker uses the TypeScript compiler API and supports TypeScript/JavaScript syntax plus Angular/React-oriented analysis; discovered literals/imports/relationships are static evidence, not proof of runtime execution.
 - Repository evidence inventories project/package/configuration and infrastructure declarations. Configuration values are not intended to be copied into generated summaries. Confidence is explicitly distinguished (`Observed` or `Inferred`) where applicable.
 - Authored Gherkin features are parsed as behavior documentation; symbol linking is heuristic and evidence-based, and cannot establish business completeness. API-endpoint scenarios generated from code are tagged `@draft` and `@review_required`; they are prompts for review, not authoritative requirements.
+- When the `behavior` diagram is selected, each authored or generated behavior feature gets a concise `features/<slug>/README.md` and a matching `behavior.mmd` or `behavior.puml` diagram; `architecture.md` links to the feature pages.
 - Implemented BDD specifications: [`code-explainer-cli.feature`](../behavior/code-explainer-cli.feature) exercises CLI/pipeline behaviors with Reqnroll + xUnit; [`typescript-analysis.feature`](../../workers/typescript-analyzer/features/typescript-analysis.feature) exercises worker protocol scenarios with Cucumber.js.
 
 ## Evidence-backed technology and configuration inventory

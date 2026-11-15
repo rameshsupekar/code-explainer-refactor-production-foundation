@@ -1,0 +1,87 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="image-reader">
+    <div class="diagram-toolbar" aria-label="Image controls">
+        <button type="button" class="quiet-button" @onclick="ZoomOut" aria-label="Zoom out">−</button>
+        <button type="button" class="quiet-button" @onclick="FitImage">Fit width</button>
+        <button type="button" class="quiet-button" @onclick="ResetZoom">100%</button>
+        <button type="button" class="quiet-button" @onclick="ZoomIn" aria-label="Zoom in">+</button>
+        <button type="button" class="quiet-button" @onclick="TogglePan" aria-pressed="@panEnabled">@(panEnabled ? "Hand on" : "Hand")</button>
+        @if (HasVectorAlternative)
+        {
+            <button type="button" class="primary-button" @onclick="OnOpenVectorAlternative">Open vector version</button>
+        }
+    </div>
+
+    @if (HasVectorAlternative)
+    {
+        <p class="source-notice">This is a raster export and may soften when enlarged. Open its vector version for crisp zooming.</p>
+    }
+
+    @if (viewerError.Length > 0)
+    {
+        <div class="render-notice" role="status">@viewerError</div>
+    }
+
+    <div class="image-viewport" aria-label="Scrollable exported image">
+        <img id="image-visual" src="@Source" alt="@Alt" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Source { get; set; } = string.Empty;
+    [Parameter] public string Alt { get; set; } = string.Empty;
+    [Parameter] public string? SvgSource { get; set; }
+    [Parameter] public bool HasVectorAlternative { get; set; }
+    [Parameter] public EventCallback OnOpenVectorAlternative { get; set; }
+
+    private IJSObjectReference? module;
+    private string? lastSource;
+    private string viewerError = string.Empty;
+    private bool panEnabled;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (lastSource == Source)
+            return;
+
+        try
+        {
+            module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/diagram-viewer.js");
+            await module.InvokeVoidAsync("initializeImageView", "image-visual", SvgSource);
+            lastSource = Source;
+        }
+        catch (JSException)
+        {
+            viewerError = "Image controls could not be loaded. The image remains available with the browser's scroll controls.";
+            lastSource = Source;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ZoomIn() => await InvokeImageControl("setImageZoom", 1.2);
+    private async Task ZoomOut() => await InvokeImageControl("setImageZoom", 1 / 1.2);
+    private async Task FitImage() => await InvokeImageControl("fitImage");
+    private async Task ResetZoom() => await InvokeImageControl("resetImageZoom");
+
+    private async Task TogglePan()
+    {
+        panEnabled = !panEnabled;
+        await InvokeImageControl("setDiagramPanEnabled", panEnabled);
+    }
+
+    private async Task InvokeImageControl(string method, params object[] arguments)
+    {
+        if (module is null)
+            return;
+
+        await module.InvokeVoidAsync(method, new object[] { "image-visual" }.Concat(arguments).ToArray());
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+            await module.DisposeAsync();
+    }
+}

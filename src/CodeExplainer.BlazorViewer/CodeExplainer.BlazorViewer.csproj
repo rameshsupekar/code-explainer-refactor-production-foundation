@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RazorLangVersion>latest</RazorLangVersion>
+
+    <!-- Keep linking enabled for smaller payloads, but do NOT enable AOT/publish flags by default.
+         AOT for Blazor WebAssembly should be enabled only at publish time using MSBuild properties,
+         because `dotnet run` (the dev flow) does not support AOT for the browser-wasm RID. -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(Microsoft_AspNetCore_Components_WebAssembly_Version)" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(Microsoft_AspNetCore_Components_WebAssembly_DevServer_Version)" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

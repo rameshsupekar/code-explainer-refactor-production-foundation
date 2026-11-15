@@ -1,0 +1,357 @@
+@using System.Text.RegularExpressions
+
+<article class="markdown-document">
+    @foreach (var block in blocks)
+    {
+        @if (block.Kind == "heading")
+        {
+            @if (block.Level == 1)
+            {
+                <h1>@RenderInline(block.Text)</h1>
+            }
+            else if (block.Level == 2)
+            {
+                <h2>@RenderInline(block.Text)</h2>
+            }
+            else
+            {
+                <h3>@RenderInline(block.Text)</h3>
+            }
+        }
+        else if (block.Kind == "paragraph")
+        {
+            <p>@RenderInline(block.Text)</p>
+        }
+        else if (block.Kind == "quote")
+        {
+            <blockquote>@RenderInline(block.Text)</blockquote>
+        }
+        else if (block.Kind == "code")
+        {
+            <pre class="markdown-code"><code>@block.Text</code></pre>
+        }
+        else if (block.Kind == "list")
+        {
+            <ul>
+                @foreach (var item in block.Items ?? Array.Empty<string>())
+                {
+                    <li>@RenderInline(item)</li>
+                }
+            </ul>
+        }
+        else if (block.Kind == "ordered-list")
+        {
+            <ol>
+                @foreach (var item in block.Items ?? Array.Empty<string>())
+                {
+                    <li>@RenderInline(item)</li>
+                }
+            </ol>
+        }
+        else if (block.Kind == "table")
+        {
+            <div class="markdown-table-wrap">
+                <table>
+                    @foreach (var row in block.Rows ?? Array.Empty<IReadOnlyList<string>>())
+                    {
+                        <tr>
+                            @foreach (var cell in row)
+                            {
+                                <td>@RenderInline(cell)</td>
+                            }
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+        else if (block.Kind == "rule")
+        {
+            <hr />
+        }
+        else if (block.Kind == "image")
+        {
+            var imageSource = FindImageSource(block.Target);
+            @if (imageSource is not null)
+            {
+                <figure class="markdown-image-viewport">
+                    <img src="@imageSource" alt="@block.Text" />
+                    @if (block.Text.Length > 0)
+                    {
+                        <figcaption>@block.Text</figcaption>
+                    }
+                </figure>
+            }
+            else
+            {
+                <p class="missing-image">Image is not included in this guide: @block.Target</p>
+            }
+        }
+    }
+</article>
+
+@code {
+    [Parameter] public string Content { get; set; } = string.Empty;
+    [Parameter] public string SourcePath { get; set; } = string.Empty;
+    [Parameter] public IReadOnlyDictionary<string, string> ImageSources { get; set; } =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    [Parameter] public EventCallback<string> OnDocumentLink { get; set; }
+
+    private IReadOnlyList<MarkdownBlock> blocks = Array.Empty<MarkdownBlock>();
+    private static readonly Regex HeadingPattern = new("^(#{1,6})\\s+(.+)$", RegexOptions.Compiled);
+    private static readonly Regex UnorderedListPattern = new("^\\s*[-*+]\\s+(.+)$", RegexOptions.Compiled);
+    private static readonly Regex OrderedListPattern = new("^\\s*\\d+[.)]\\s+(.+)$", RegexOptions.Compiled);
+    private static readonly Regex ImageOnlyPattern = new("^!\\[([^\\]]*)\\]\\(([^)]+)\\)$", RegexOptions.Compiled);
+    private static readonly Regex InlinePattern = new("!\\[([^\\]]*)\\]\\(([^)]+)\\)|`[^`]+`|\\*\\*.+?\\*\\*|\\[[^\\]]+\\]\\([^)]+\\)", RegexOptions.Compiled);
+
+    protected override void OnParametersSet() => blocks = Parse(Content);
+
+    private RenderFragment RenderInline(string value) => builder =>
+    {
+        var position = 0;
+        var sequence = 0;
+        foreach (Match match in InlinePattern.Matches(value))
+        {
+            if (match.Index > position)
+                builder.AddContent(sequence++, value[position..match.Index]);
+
+            var token = match.Value;
+            if (token.StartsWith("![", StringComparison.Ordinal))
+            {
+                var separator = token.IndexOf("](", StringComparison.Ordinal);
+                var alt = token[2..separator];
+                var source = FindImageSource(token[(separator + 2)..^1]);
+                if (source is null)
+                {
+                    builder.OpenElement(sequence++, "span");
+                    builder.AddAttribute(sequence++, "class", "missing-inline-image");
+                    builder.AddContent(sequence++, $"[Image not included: {alt}]");
+                    builder.CloseElement();
+                }
+                else
+                {
+                    builder.OpenElement(sequence++, "img");
+                    builder.AddAttribute(sequence++, "class", "markdown-inline-image");
+                    builder.AddAttribute(sequence++, "src", source);
+                    builder.AddAttribute(sequence++, "alt", alt);
+                    builder.CloseElement();
+                }
+            }
+            else if (token.StartsWith('`'))
+            {
+                builder.OpenElement(sequence++, "code");
+                builder.AddContent(sequence++, token[1..^1]);
+                builder.CloseElement();
+            }
+            else if (token.StartsWith("**", StringComparison.Ordinal))
+            {
+                builder.OpenElement(sequence++, "strong");
+                builder.AddContent(sequence++, token[2..^2]);
+                builder.CloseElement();
+            }
+            else
+            {
+                var separator = token.IndexOf("](", StringComparison.Ordinal);
+                var label = token[1..separator];
+                var href = token[(separator + 2)..^1];
+                if (IsExternalLink(href))
+                {
+                    builder.OpenElement(sequence++, "a");
+                    builder.AddAttribute(sequence++, "href", href);
+                    builder.AddAttribute(sequence++, "target", "_blank");
+                    builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+                    builder.AddContent(sequence++, label);
+                    builder.CloseElement();
+                }
+                else if (href.StartsWith('#'))
+                {
+                    builder.OpenElement(sequence++, "a");
+                    builder.AddAttribute(sequence++, "href", href);
+                    builder.AddContent(sequence++, label);
+                    builder.CloseElement();
+                }
+                else
+                {
+                    builder.OpenElement(sequence++, "a");
+                    builder.AddAttribute(sequence++, "href", href);
+                    builder.AddAttribute(sequence++, "onclick", EventCallback.Factory.Create<MouseEventArgs>(
+                        this, () => OnDocumentLink.InvokeAsync(href)));
+                    builder.AddEventPreventDefaultAttribute(sequence++, "onclick", true);
+                    builder.AddContent(sequence++, label);
+                    builder.CloseElement();
+                }
+            }
+            position = match.Index + match.Length;
+        }
+        if (position < value.Length)
+            builder.AddContent(sequence, value[position..]);
+    };
+
+    private static bool IsExternalLink(string href) =>
+        Uri.TryCreate(href, UriKind.Absolute, out var uri) &&
+        uri.Scheme is "http" or "https" or "mailto";
+
+    private string? FindImageSource(string href)
+    {
+        try
+        {
+            var path = Uri.UnescapeDataString(href).Split('?', '#')[0];
+            if (string.IsNullOrWhiteSpace(path) || path.StartsWith('/') || path.Contains(':'))
+                return null;
+
+            var parts = (Path.GetDirectoryName(SourcePath.Replace('/', Path.DirectorySeparatorChar)) ?? string.Empty)
+                .Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+            foreach (var part in path.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (part == ".")
+                    continue;
+                if (part == "..")
+                {
+                    if (parts.Count == 0)
+                        return null;
+                    parts.RemoveAt(parts.Count - 1);
+                }
+                else
+                {
+                    parts.Add(part);
+                }
+            }
+
+            var relativePath = string.Join('/', parts);
+            return ImageSources.TryGetValue(relativePath, out var imageSource) ? imageSource : null;
+        }
+        catch (UriFormatException)
+        {
+            return null;
+        }
+        catch (ArgumentException)
+        {
+            return null;
+        }
+    }
+
+    private static IReadOnlyList<MarkdownBlock> Parse(string content)
+    {
+        var lines = content.Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n');
+        var result = new List<MarkdownBlock>();
+        var index = 0;
+
+        while (index < lines.Length)
+        {
+            var line = lines[index];
+            var trimmed = line.Trim();
+            if (trimmed.Length == 0)
+            {
+                index++;
+                continue;
+            }
+
+            if (trimmed.StartsWith("```", StringComparison.Ordinal))
+            {
+                index++;
+                var code = new List<string>();
+                while (index < lines.Length && !lines[index].TrimStart().StartsWith("```", StringComparison.Ordinal))
+                    code.Add(lines[index++]);
+                if (index < lines.Length)
+                    index++;
+                result.Add(new MarkdownBlock("code", string.Join('\n', code)));
+                continue;
+            }
+
+            var heading = HeadingPattern.Match(trimmed);
+            if (heading.Success)
+            {
+                result.Add(new MarkdownBlock("heading", heading.Groups[2].Value, heading.Groups[1].Length));
+                index++;
+                continue;
+            }
+
+            var image = ImageOnlyPattern.Match(trimmed);
+            if (image.Success)
+            {
+                result.Add(new MarkdownBlock("image", image.Groups[1].Value, Target: image.Groups[2].Value));
+                index++;
+                continue;
+            }
+
+            if (trimmed.StartsWith('>'))
+            {
+                result.Add(new MarkdownBlock("quote", trimmed[1..].Trim()));
+                index++;
+                continue;
+            }
+
+            if (trimmed is "---" or "***" or "___")
+            {
+                result.Add(new MarkdownBlock("rule", string.Empty));
+                index++;
+                continue;
+            }
+
+            if (UnorderedListPattern.IsMatch(line))
+            {
+                var items = new List<string>();
+                while (index < lines.Length && UnorderedListPattern.Match(lines[index]) is { Success: true } item)
+                {
+                    items.Add(item.Groups[1].Value);
+                    index++;
+                }
+                result.Add(new MarkdownBlock("list", string.Empty, Items: items));
+                continue;
+            }
+
+            if (OrderedListPattern.IsMatch(line))
+            {
+                var items = new List<string>();
+                while (index < lines.Length && OrderedListPattern.Match(lines[index]) is { Success: true } item)
+                {
+                    items.Add(item.Groups[1].Value);
+                    index++;
+                }
+                result.Add(new MarkdownBlock("ordered-list", string.Empty, Items: items));
+                continue;
+            }
+
+            if (trimmed.StartsWith('|'))
+            {
+                var rows = new List<IReadOnlyList<string>>();
+                while (index < lines.Length && lines[index].TrimStart().StartsWith('|'))
+                {
+                    var cells = lines[index].Trim().Trim('|').Split('|')
+                        .Select(cell => cell.Trim())
+                        .ToArray();
+                    if (!cells.All(cell => cell.Length == 0 || cell.All(character => character is '-' or ':' or ' ')))
+                        rows.Add(cells);
+                    index++;
+                }
+                if (rows.Count > 0)
+                    result.Add(new MarkdownBlock("table", string.Empty, Rows: rows));
+                continue;
+            }
+
+            var paragraph = new List<string> { trimmed };
+            index++;
+            while (index < lines.Length && lines[index].Trim().Length > 0 &&
+                !HeadingPattern.IsMatch(lines[index].Trim()) &&
+                !lines[index].TrimStart().StartsWith('>') &&
+                !UnorderedListPattern.IsMatch(lines[index]) &&
+                !OrderedListPattern.IsMatch(lines[index]) &&
+                !lines[index].TrimStart().StartsWith("```", StringComparison.Ordinal))
+            {
+                paragraph.Add(lines[index].Trim());
+                index++;
+            }
+            result.Add(new MarkdownBlock("paragraph", string.Join(' ', paragraph)));
+        }
+
+        return result;
+    }
+
+    private sealed record MarkdownBlock(
+        string Kind,
+        string Text,
+        int Level = 0,
+        IReadOnlyList<string>? Items = null,
+        IReadOnlyList<IReadOnlyList<string>>? Rows = null,
+        string Target = "");
+}

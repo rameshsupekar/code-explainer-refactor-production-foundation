@@ -140,7 +140,88 @@ namespace CodeExplainer.Export.Markdown
             return sb.ToString();
         }
 
+        public string ExportBehaviorFeature(CodeModel model, BehaviorFeature feature, string diagramFileName)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+            ArgumentNullException.ThrowIfNull(feature);
+            ArgumentException.ThrowIfNullOrWhiteSpace(diagramFileName);
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"# {EscapeMarkdown(feature.Name)}\n");
+            sb.AppendLine($"- Source: `{EscapeMarkdown(feature.SourcePath)}`");
+            sb.AppendLine($"- Scenarios: {feature.Scenarios.Count}");
+            sb.AppendLine($"- Behavior diagram: [`{EscapeMarkdown(diagramFileName)}`](./{EscapeMarkdown(diagramFileName)})");
+
+            if (feature.IsGeneratedDraft)
+            {
+                sb.AppendLine("\n> Generated from static analysis. Review and replace inferred steps with verified business outcomes before treating this as a specification.\n");
+            }
+
+            var symbolsById = model.Symbols.ToDictionary(symbol => symbol.Id, StringComparer.Ordinal);
+            sb.AppendLine("\n## Scenarios\n");
+            if (feature.Scenarios.Count == 0)
+            {
+                sb.AppendLine("No scenarios were found.");
+            }
+            else
+            {
+                foreach (var scenario in feature.Scenarios)
+                {
+                    sb.AppendLine($"### {EscapeMarkdown(scenario.Name)}\n");
+                    if (scenario.IsGeneratedDraft)
+                        sb.AppendLine("Draft; review required.\n");
+                    if (scenario.Tags.Count > 0)
+                        sb.AppendLine($"- Tags: {string.Join(", ", scenario.Tags.Select(EscapeMarkdown))}");
+
+                    if (scenario.Steps.Count > 0)
+                    {
+                        sb.AppendLine("- Steps:");
+                        foreach (var step in scenario.Steps)
+                            sb.AppendLine($"  - {EscapeMarkdown(step)}");
+                    }
+                    else
+                    {
+                        sb.AppendLine("- Steps: none recorded");
+                    }
+
+                    var relatedSymbols = scenario.RelatedSymbolIds
+                        .Where(symbolsById.ContainsKey)
+                        .Select(id => symbolsById[id])
+                        .OrderBy(symbol => symbol.FilePath, StringComparer.Ordinal)
+                        .ThenBy(symbol => symbol.Location.StartLine)
+                        .ToArray();
+                    if (relatedSymbols.Length > 0)
+                    {
+                        sb.AppendLine("- Evidence-linked implementation:");
+                        foreach (var symbol in relatedSymbols)
+                            sb.AppendLine($"  - **{EscapeMarkdown(symbol.Name)}** ({symbol.Kind}) — `{EscapeMarkdown(symbol.FilePath)}:{symbol.Location.StartLine}`");
+                    }
+                    else
+                    {
+                        sb.AppendLine("- Evidence-linked implementation: not established from available source evidence.");
+                    }
+                    sb.AppendLine();
+                }
+            }
+
+            sb.AppendLine("## Scope note\n");
+            sb.AppendLine("This page records behavior scenarios and static-analysis links only. It does not prove that every runtime path or business requirement is represented.");
+            return sb.ToString();
+        }
+
+        public string ExportBehaviorFeatureIndex(IReadOnlyList<(BehaviorFeature Feature, string ReadmePath)> featureReadmes)
+        {
+            ArgumentNullException.ThrowIfNull(featureReadmes);
+            if (featureReadmes.Count == 0)
+                return string.Empty;
+
+            var sb = new StringBuilder("\n## Per-feature behavior documentation\n\n");
+            foreach (var (feature, readmePath) in featureReadmes)
+                sb.AppendLine($"- [{EscapeMarkdown(feature.Name)}](./{EscapeMarkdown(readmePath)})");
+            return sb.ToString();
+        }
+
         private static string EscapeMarkdown(string value) =>
-            value.Replace("|", "\\|").Replace("\r", " ").Replace("\n", " ");
+            value.Replace("|", "\\|").Replace("`", "\\`").Replace("\r", " ").Replace("\n", " ");
     }
 }

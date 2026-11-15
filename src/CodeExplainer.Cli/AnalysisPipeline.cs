@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeExplainer.Analyzers.CSharp;
@@ -152,10 +153,71 @@ namespace CodeExplainer.Cli
                 outputFiles.Add(outputFile);
             }
 
+            var markdownExporter = new MarkdownExporter();
+            var featureReadmes = new List<(BehaviorFeature Feature, string ReadmePath)>();
+            if (diagramTypes.Contains("behavior", StringComparer.OrdinalIgnoreCase))
+            {
+                var featureOutputDirectory = Path.Combine(outputDirectory, "features");
+                var usedFeatureNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var feature in behaviorFeatures
+                    .OrderBy(feature => feature.SourcePath, StringComparer.Ordinal)
+                    .ThenBy(feature => feature.Name, StringComparer.Ordinal))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var featureName = CreateUniqueFeatureName(feature.Name, usedFeatureNames);
+                    var featureDirectory = Path.Combine(featureOutputDirectory, featureName);
+                    Directory.CreateDirectory(featureDirectory);
+
+                    var diagramFileName = $"behavior{extension}";
+                    var featureDiagramFile = Path.Combine(featureDirectory, diagramFileName);
+                    var featureDiagram = ExportDiagram(format, "behavior", model, projectInfo, new[] { feature });
+                    await File.WriteAllTextAsync(featureDiagramFile, featureDiagram, cancellationToken).ConfigureAwait(false);
+                    outputFiles.Add(featureDiagramFile);
+
+                    var featureReadme = Path.Combine(featureDirectory, "README.md");
+                    var featureSummary = markdownExporter.ExportBehaviorFeature(model, feature, diagramFileName);
+                    await File.WriteAllTextAsync(featureReadme, featureSummary, cancellationToken).ConfigureAwait(false);
+                    outputFiles.Add(featureReadme);
+                    var relativeReadmePath = Path.GetRelativePath(outputDirectory, featureReadme).Replace('\\', '/');
+                    featureReadmes.Add((feature, relativeReadmePath));
+                }
+            }
+
             var summaryFile = Path.Combine(outputDirectory, "architecture.md");
-            await File.WriteAllTextAsync(summaryFile, new MarkdownExporter().ExportSummary(model, projectInfo), cancellationToken).ConfigureAwait(false);
+            var summary = markdownExporter.ExportSummary(model, projectInfo);
+            if (featureReadmes.Count > 0)
+                summary += markdownExporter.ExportBehaviorFeatureIndex(featureReadmes);
+            await File.WriteAllTextAsync(summaryFile, summary, cancellationToken).ConfigureAwait(false);
             outputFiles.Add(summaryFile);
+
             return new AnalysisPipelineResult(model, outputFiles);
+        }
+
+        private static string CreateUniqueFeatureName(string featureName, HashSet<string> usedNames)
+        {
+            var builder = new StringBuilder();
+            foreach (var character in featureName.ToLowerInvariant())
+            {
+                if (char.IsAsciiLetterOrDigit(character))
+                {
+                    builder.Append(character);
+                }
+                else if (builder.Length > 0 && builder[^1] != '-')
+                {
+                    builder.Append('-');
+                }
+            }
+
+            var baseName = builder.ToString().Trim('-');
+            if (baseName.Length == 0)
+                baseName = "feature";
+            if (baseName.Length > 80)
+                baseName = baseName[..80].TrimEnd('-');
+
+            var uniqueName = baseName;
+            for (var suffix = 2; !usedNames.Add(uniqueName); suffix++)
+                uniqueName = $"{baseName}-{suffix}";
+            return uniqueName;
         }
 
         private static string ExportDiagram(
